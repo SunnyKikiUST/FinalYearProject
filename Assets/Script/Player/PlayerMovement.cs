@@ -23,9 +23,6 @@ public class PlayerMovement : MonoBehaviour
     private bool isGrounded = false; // Track if the character is grounded
     private bool isSliding = false;
 
-    private float runningSlideDuration = -1f; // Cooldown duration for ignoring the OnCollisionEnter method
-    private float durationMinimize = 0f;
-
     private CapsuleCollider capsuleCollider;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
