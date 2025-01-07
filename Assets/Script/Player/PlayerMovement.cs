@@ -6,11 +6,14 @@ using UnityEditor;
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float player_speed = 20;
-    [SerializeField] private float horizontal_speed = 3;
-    [SerializeField] private float right_limit = 5.5f;
-    [SerializeField] private float left_limit = -5.5f;
+    [SerializeField] private float horizontal_speed = 1.5f;
     [SerializeField] private float jump_force = 60f;
     [SerializeField] private float bufferCheckDistance = 0.1f;
+
+    private int current_path = 1;
+    [SerializeField] private float left_path_x = -3.75f;
+    [SerializeField] private float middle_path_x = 0f;
+    [SerializeField] private float right_path_x = 3.75f;
     RaycastHit hit;
 
     private Animator animator;
@@ -50,19 +53,34 @@ public class PlayerMovement : MonoBehaviour
 
         if ( //move left
             Input.GetKey(KeyCode.A) &&
-            this.gameObject.transform.position.x > left_limit
+            current_path > 0
             ) 
         {
-            transform.Translate(Vector3.left * horizontal_speed * Time.deltaTime, Space.World);
+            current_path--;
         }
         else if ( //move right
             Input.GetKey(KeyCode.D) &&
-            this.gameObject.transform.position.x < right_limit
+            current_path < 2
             ) 
         {
-            transform.Translate(Vector3.right * horizontal_speed * Time.deltaTime, Space.World);
+            current_path++;
+        }
+        else if (Input.GetKeyDown(KeyCode.S))
+        {
+            current_path = 1;
         }
 
+        float target_x = middle_path_x;
+        if (current_path == 0)
+        {
+            target_x = left_path_x;
+        }
+        else if (current_path == 2)
+        {
+            target_x = right_path_x;
+        }
+        Vector3 target_pos = new Vector3(target_x, transform.position.y, transform.position.z);
+        transform.position = Vector3.Lerp(transform.position, target_pos, horizontal_speed * Time.deltaTime);
 
         if (isGrounded && Input.GetKeyDown(KeyCode.Space))
         {
