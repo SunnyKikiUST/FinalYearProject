@@ -10,7 +10,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{E519085B-ECF6-396B-9F28-81863C979E0E}</ProjectGuid>
+    <ProjectGuid>{685D469A-4BFD-3182-342A-FAA138FC2213}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>BlockadeLabsSDK.Editor</AssemblyName>
@@ -1129,7 +1129,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="BlockadeLabsSDK.Runtime.csproj">
-      <Project>{23F56117-6F32-50E2-99EA-99A8055126B1}</Project>
+      <Project>{B89E028B-E280-1AF0-A206-0BC8FE632178}</Project>
       <Name>BlockadeLabsSDK.Runtime</Name>
     </ProjectReference>
   </ItemGroup>

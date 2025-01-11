@@ -9,8 +9,7 @@ public class ObstacleCollision : MonoBehaviour
     {
         Debug.Log("Collision happen");
         this.gameObject.GetComponent<BoxCollider>().enabled = false;
-        player.GetComponent<PlayerMovement>().enabled = false;
+        player.GetComponent<PlayerMovementWithMVEstimation>().enabled = false;
         character_model.GetComponent<Animator>().Play("Stumble Backwards");
-        //character_model.GetComponent<Animator>().Play("Jump");
     }
 }

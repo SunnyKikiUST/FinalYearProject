@@ -6,7 +6,7 @@ using UnityEditor;
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float player_speed = 20;
-    [SerializeField] private float horizontal_speed = 1.5f;
+    [SerializeField] private float horizontal_speed = 10f;
     [SerializeField] private float jump_force = 60f;
     [SerializeField] private float bufferCheckDistance = 0.1f;
 

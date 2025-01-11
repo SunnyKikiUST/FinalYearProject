@@ -10,7 +10,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace>BlockadeLabsSDK.Tests</RootNamespace>
-    <ProjectGuid>{084170BA-77A4-656B-DAD1-84AC1A8B7728}</ProjectGuid>
+    <ProjectGuid>{AD5EE7C8-6D47-F9BB-64BE-F1F24350B67A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>BlockadeLabsSDK.Tests</AssemblyName>
@@ -1080,7 +1080,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="BlockadeLabsSDK.Runtime.csproj">
-      <Project>{23F56117-6F32-50E2-99EA-99A8055126B1}</Project>
+      <Project>{B89E028B-E280-1AF0-A206-0BC8FE632178}</Project>
       <Name>BlockadeLabsSDK.Runtime</Name>
     </ProjectReference>
   </ItemGroup>

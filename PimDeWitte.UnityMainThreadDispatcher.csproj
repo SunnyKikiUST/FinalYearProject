@@ -9,11 +9,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace>BlockadeLabsSDK.Runtime</RootNamespace>
-    <ProjectGuid>{B89E028B-E280-1AF0-A206-0BC8FE632178}</ProjectGuid>
+    <RootNamespace>PimDeWitte.UnityMainThreadDispatcher</RootNamespace>
+    <ProjectGuid>{5FD6578C-790F-8BA6-5FA7-2380874F367E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <AssemblyName>BlockadeLabsSDK.Runtime</AssemblyName>
+    <AssemblyName>PimDeWitte.UnityMainThreadDispatcher</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseDirectory>.</BaseDirectory>
@@ -61,75 +61,10 @@
     <Analyzer Include="E:\Unity\6000.0.24f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\API\BlockadeLabsAuthInfo.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\UI\StyleItem.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\API\BlockadeLabsBaseEndpoint.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\API\Skyboxes\SkyboxExportOption.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\API\Rest.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\Extensions\BakeDepth.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\UI\AspectLayoutElement.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\UI\RemixPanel.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\API\BlockadeLabsConfiguration.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\Extensions\PanoramicToCubemap.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\UI\HideAfterClick.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\Extensions\UnityWebRequestAwaiter.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\TetrahedronMesh.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\Extensions\AssetUtils.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\API\RestException.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\API\IListResponse.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\UI\SkyboxPreviewPopup.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\API\BlockadeLabsClientSettingsInfo.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\API\Skyboxes\SkyboxHistoryParameters.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\API\Feedback\FeedbackEndpoint.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\UI\SearchToolbar.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\UI\BlockadeLabsSkyboxGenerator.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\API\Skyboxes\SkyboxExportRequest.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\UI\DisabledColor.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\UI\RuntimeGuiManager.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\SkyboxAI.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\UI\DpiFixer.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\API\Skyboxes\SortOrder.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\API\Skyboxes\DefaultExportOptions.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\UI\StylePickerPanel.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\UI\PopupButton.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\Extensions\ObjectUtils.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\API\BlockadeLabsClientSettings.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\UI\HistoryPanel.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\UI\InputFieldResizer.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\Extensions\StringExtensions.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\API\Skyboxes\SkyboxHistory.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\API\Response.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\API\ResponseExtensions.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\Extensions\UnitySynchronizationContext.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\API\Skyboxes\SkyboxModel.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\UI\DialogBox.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\API\Skyboxes\SkyboxEndpoint.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\UI\OpenHyperlink.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\UI\Hoverable.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\UI\DynamicMaterial.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\API\Skyboxes\SkyboxStyle.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\API\Skyboxes\Status.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\UI\HDRPDemoVolume.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\UI\MultiToggle.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\UI\BlockadeDemoCamera.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\API\BlockadeLabsAuthentication.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\UI\BlockadeLabsSkyboxMesh.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\API\Skyboxes\SkyboxInfo.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\API\BlockadeLabsClient.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\Extensions\AwaiterExtensions.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\Extensions\UnityMainThread.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\API\Skyboxes\IStatus.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\API\BaseResponse.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\Extensions\UnityMainThreadAwaiter.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\UI\HistoryItemBehaviour.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\API\ExportUtilities.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\Runtime\API\Skyboxes\SkyboxRequest.cs" />
-    <Compile Include="Packages\com.blockadelabs.sdk\AssemblyInfo.cs" />
+    <Compile Include="Assets\Script\UnityMainThreadDispatcher-master\Runtime\UnityMainThreadDispatcher.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Packages\com.blockadelabs.sdk\Shaders\PanoramicToCubemap.compute" />
-    <None Include="Packages\com.blockadelabs.sdk\BlockadeLabsSDK.Runtime.asmdef" />
-    <None Include="Packages\com.blockadelabs.sdk\Shaders\Blockade Skybox Depth.shader" />
+    <None Include="Assets\Script\UnityMainThreadDispatcher-master\Runtime\PimDeWitte.UnityMainThreadDispatcher.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -1142,10 +1077,6 @@
     </Reference>
     <Reference Include="System.Xml.Serialization">
       <HintPath>E:\Unity\6000.0.24f1\Editor\Data\NetStandard\compat\2.1.0\shims\netfx\System.Xml.Serialization.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.TextMeshPro">
-      <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEditor.UI">

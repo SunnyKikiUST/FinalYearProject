@@ -362,3 +362,10 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /Temp
+
+/Library
+
+# Ignore Python virtual environment
+venv/
+env/
+StreamingAssets/venv/
