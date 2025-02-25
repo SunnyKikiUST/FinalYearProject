@@ -4,7 +4,7 @@ using Unity.VisualScripting;
 using UnityEditor;
 using System.Collections.Generic;
 
-public class NewMonoBehaviourScript : MonoBehaviour
+public class GenerateLevel : MonoBehaviour
 {
     public GameObject[] section;
 

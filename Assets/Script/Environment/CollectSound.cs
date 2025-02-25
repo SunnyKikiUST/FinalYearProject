@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CollectSound : MonoBehaviour
 {
@@ -7,7 +8,11 @@ public class CollectSound : MonoBehaviour
     // Update is called once per frame
     void OnTriggerEnter(Collider other)
     {
-        sound.Play();
+        if(other.tag == "Player")
+        {
+            CollectableControl.IncreaseCoinByOne();
+            sound.Play();
+        }
 
         //gameObject.SetActive(false);
         Destroy(gameObject);

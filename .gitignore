@@ -369,3 +369,6 @@ FodyWeavers.xsd
 venv/
 env/
 StreamingAssets/venv/
+/Assets/Plugins/iOS/Firebase
+/Assets/StreamingAssets/yolov7-w6-pose.pt
+/Assets/Plugins/MongoDB

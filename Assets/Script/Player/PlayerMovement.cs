@@ -80,6 +80,7 @@ public class PlayerMovement : MonoBehaviour
             target_x = right_path_x;
         }
         Vector3 target_pos = new Vector3(target_x, transform.position.y, transform.position.z);
+        // Move direction (i.e. move to different path)
         transform.position = Vector3.Lerp(transform.position, target_pos, horizontal_speed * Time.deltaTime);
 
         if (isGrounded && Input.GetKeyDown(KeyCode.Space))
@@ -121,7 +122,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if(current_animation != animation)
         {
-            //Debug.Log($"Changing animation from {current_animation} to {animation}");
+            Debug.Log($"Changing animation from {current_animation} to {animation}");
             current_animation = animation;
             animator.CrossFade(animation, cross_fade, 0);
         }
@@ -133,6 +134,10 @@ public class PlayerMovement : MonoBehaviour
        {
             Debug.Log("Character has landed on the ground.");
             isGrounded = true; // The character is now grounded
+
+            //stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+            //if(stateInfo.IsName("Jump") &&
+
             ChangeAnimation("Fast Run");
         }
         //Jump character is sliding and Jump, there will be no problem to execute the following code
@@ -144,7 +149,7 @@ public class PlayerMovement : MonoBehaviour
             //StartCoroutine(EnableCollisionAfterCooldown());
 
             stateInfo = animator.GetCurrentAnimatorStateInfo(0);
-            if (stateInfo.normalizedTime >= 1f)
+            if (stateInfo.normalizedTime >= 0.9f)
             {
                 isSliding = false;
                 Vector3 newCenter = capsuleCollider.center;
@@ -194,7 +199,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (collision.gameObject.layer == LayerMask.NameToLayer("Ground"))
         {
-            //Debug.Log("Character has left the ground.");
+            Debug.Log("Character has left the ground.");
             isGrounded = false; // The character is no longer grounded
         }
     }

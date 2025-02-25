@@ -359,7 +359,6 @@ public class PlayerMovementWithMVEstimation : MonoBehaviour
 
 
                 UnityMainThreadDispatcher.Instance().Enqueue(() =>{
-                    UnityEngine.Debug.Log($"First MainThreadDispatcher in GetMovementAndFrame");
                     //detection_result = Encoding.UTF8.GetString(detection_buffer).Trim();
                     int result = BitConverter.ToInt32(detection_buffer, 0);
                     if (result != -1) future_detection_result = result;

@@ -3,7 +3,7 @@ using UnityEngine;
 public class CollectRotation : MonoBehaviour
 {
 
-    [SerializeField] int rotateSpeed = 60;
+    [SerializeField] private int rotateSpeed = 60;
     // Update is called once per frame
     void Update()
     {

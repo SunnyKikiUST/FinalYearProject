@@ -26,3 +26,6 @@ seaborn>=0.11.0
 ipython  # interactive notebook
 psutil  # system utilization
 thop  # FLOPs computation
+
+# Before donwloading above modules, please create a virtual environment in current directory and put yolov7-w6-pose.pt (Download: https://drive.google.com/drive/folders/1-1bzpX1EJwCrA7IMzrihfI5DctX1MTju) in current directory
+

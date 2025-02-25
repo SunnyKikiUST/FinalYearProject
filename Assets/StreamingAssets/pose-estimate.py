@@ -48,6 +48,7 @@ def run(poseweights="yolov7-w6-pose.pt",source="0",device='cpu',view_img=False,
     # total_fps = 0  #count total fps
     # time_list = []   #list to store time
     # fps_list = []    #list to store fps
+    should_exit = False
     
     device = select_device(opt.device) #select device
     half = device.type != 'cpu'
@@ -59,7 +60,7 @@ def run(poseweights="yolov7-w6-pose.pt",source="0",device='cpu',view_img=False,
     names = model.module.names if hasattr(model, 'module') else model.names  # get class names
    
     if source.isnumeric() :    
-        cap = cv2.VideoCapture(int(source))    #pass video to videocapture object
+        cap = cv2.VideoCapture(int(source), cv2.CAP_MSMF)    #pass video to videocapture object
     else :
         cap = cv2.VideoCapture(source)    #pass video to videocapture object
    
@@ -67,7 +68,7 @@ def run(poseweights="yolov7-w6-pose.pt",source="0",device='cpu',view_img=False,
         print('Error while trying to read video. Please check path again')
         raise SystemExit()
     else:
-        # Socket communcation setup for communicating with C# game section
+        #Socket communcation setup for communicating with C# game section
         server_socket = socket(AF_INET, SOCK_STREAM) # Sunny
         server_socket.bind((HOST, PORT))
         server_socket.listen(1)
@@ -82,31 +83,15 @@ def run(poseweights="yolov7-w6-pose.pt",source="0",device='cpu',view_img=False,
         if frame_width > 1280: # Sunny
           frame_width = 1280
 
-        #frame_height = int(cap.get(4)) #get video frame height
-        # recap the frame_width and frame_height(need to be multiple of 32)
-        #frame_width = 1088
-        #frame_width = 640
-        #frame_height = 1920
-
-        #print(frame_width, frame_height)
-        
-        #vid_write_image = letterbox(cap.read()[1], (frame_width), stride=64, auto=True)[0] #init videowriter
-
-        # resize_height, resize_width = vid_write_image.shape[:2]
-        # out_video_name = f"{source.split('/')[-1].split('.')[0]}"
-
-        # out = cv2.VideoWriter(f"{source}_keypoint.mp4",
-        #                     cv2.VideoWriter_fourcc(*'mp4v'), 30,
-        #                     (resize_width, resize_height))
-
         while(cap.isOpened): #loop until cap opened or video not complete
-            ret, frame = cap.read()
-            print("Frame {} Processing".format(frame_count+1)) # Sunny
+            #print("Frame {} Processing".format(frame_count+1)) # Sunny
 
-            #ret, frame = cap.read()  #get frame and success from video capture
-            # if should_exit:
-            #   print("Game termination")
-            #   break
+            start_time = time.time() #start time for fps calculation, Sunny change position of the code
+            ret, frame = cap.read()  #get frame and success from video capture
+            if should_exit:
+              print("Game termination")
+              break
+
             if ret: #if success is true, means frame exist (remove by Sunny)
               orig_image = frame #store frame
               image = cv2.cvtColor(orig_image, cv2.COLOR_BGR2RGB) #convert frame to RGB
@@ -117,7 +102,6 @@ def run(poseweights="yolov7-w6-pose.pt",source="0",device='cpu',view_img=False,
           
               image = image.to(device)  #convert image data to device
               image = image.float() #convert image to float precision (cpu)
-              # start_time = time.time() #start time for fps calculation
           
               with torch.no_grad():  #get predictions
                   output_data, _ = model(image)
@@ -219,19 +203,6 @@ def run(poseweights="yolov7-w6-pose.pt",source="0",device='cpu',view_img=False,
                           cv2.putText(im0, position, (50, 50), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 255), thickness=1, lineType=cv2.LINE_AA) # Sunny
                           cv2.line(im0, (left_boundary, 0), (left_boundary, im0.shape[0]), (0, 255, 0), thickness=2)  # Left boundary
                           cv2.line(im0, (right_boundary, 0), (right_boundary, im0.shape[0]), (0, 0, 255), thickness=2)  # Sunny
-                          # calib_c1, calib_c2 = (left_boundary-100, 100), (right_boundary, 800)
-                          # if(c1[0]>calib_c1[0] and c1[1]>calib_c1[1]) and (c2[0]<calib_c2[0] and c2[1]<calib_c2[1]):
-                          #   color = (0,255,0)
-                          # else:
-                          #   color = (0,0,255)
-                          # plot_calib_box(im0, calib_c1, calib_c2, color=color,
-                          #             line_thickness=opt.line_thickness)
-
-                          #push up count
-                          #keypoints = kpts.view(-1, 3).cpu().numpy()
-                          #push_ups, direction, _, _, _, _ = pushup_counter_from_keypoints(keypoints, push_ups, direction)
-                          #print(push_ups, direction)
-                          #cv2.putText(im0, str(push_ups), (right_boundary + 100, 50), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 255), thickness=1, lineType=cv2.LINE_AA)
 
                       # Send detection result (left, middle or right) 
                       enc_position_num = struct.pack("i", position_num) # Sunny
@@ -245,11 +216,12 @@ def run(poseweights="yolov7-w6-pose.pt",source="0",device='cpu',view_img=False,
                       # Send frame
                       client_socket.sendall(buffer) # Sunny
 
-                      # cv2.imshow("YOLOv7 Pose Estimation Demo", im0)
-                      # cv2.waitKey(1)  # 1 millisecond
+                  # cv2.imshow("YOLOv7 Pose Estimation Demo", im0)
+                  # cv2.waitKey(1)  # 1 millisecond
 
                   
-                  # end_time = time.time()  #Calculatio for FPS
+                  end_time = time.time()  #Calculatio for FPS
+                  print(f"The time spent in this loop is: {end_time - start_time}")
                   # fps = 1 / (end_time - start_time)
                   # total_fps += fps
                   # frame_count += 1
