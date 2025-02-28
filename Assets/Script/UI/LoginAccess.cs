@@ -34,6 +34,8 @@ public class LoginAccess : MonoBehaviour
         passwordInputField.text = "";
         usernameRegInputField.text = "";
         passwordRegInputField.text = "";
+        login_status_text.text = "";
+        register_status_text.text = "";
     }
 
     // Event: login operation 
@@ -58,8 +60,9 @@ public class LoginAccess : MonoBehaviour
         
         if (authenticatedResponse == "success") //Login successfully
         {
+            CurrentCoinAndScore.RetrieveRecordFromDataBase(username);
             login_status_text.text = "Login successful!";
-            SceneManager.LoadScene("Game");
+            SceneManager.LoadScene("Menu");
         }
         else
         {
@@ -86,7 +89,7 @@ public class LoginAccess : MonoBehaviour
         }
 
         // Call the registration method from the DatabaseManager singleton
-        string registeredResponse = await DatabaseManager.Instance.RegisterUser(username, password);
+        string registeredResponse = await DatabaseManager.Instance.RegisterUserAsync(username, password);
 
         if (registeredResponse == "Register successful!") //Register successfully
         {

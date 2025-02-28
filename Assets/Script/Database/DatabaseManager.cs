@@ -7,6 +7,7 @@ using System;
 using System.Threading.Tasks;
 using UnityEngine.SocialPlatforms.Impl;
 using System.Drawing;
+using System.Collections.Generic;
 
 public class DatabaseManager : MonoBehaviour
 {
@@ -27,13 +28,13 @@ public class DatabaseManager : MonoBehaviour
     private string loginCollactionName = "Users";
     private string leaderboardCollectionName = "HighScoreAndCoinsCollection";
 
-    public class User
+    private class User
     {
         [BsonId]
-        private ObjectId Id { get; set; }
+        public ObjectId Id { get; set; }
 
-        private string user_name { get; set; }
-        private string hashed_password { get; set; }
+        public string user_name { get; set; }
+        public string hashed_password { get; set; }
 
         public User(string user_name, string hashed_password)
         {
@@ -49,9 +50,9 @@ public class DatabaseManager : MonoBehaviour
     {
         [BsonId]
         private ObjectId Id { get; set; }
-        private string user_name { get; set; }
-        private int coins { get; set; }
-        private int score { get; set; }
+        public string user_name { get; set; }
+        public int coins { get; set; }
+        public int score { get; set; }
         public int point { get; set; }
         public Record(string user_name)
         {
@@ -97,11 +98,11 @@ public class DatabaseManager : MonoBehaviour
     }
 
     // Get password of the player
-    private async Task<string> GetActualPassword(string userName)
+    private async Task<string> GetActualPasswordAsync(string userName)
     {
         try
         {
-            User retrievedUser = await usersCollection.Find(info => info.GetUserName() == userName).FirstOrDefaultAsync();
+            User retrievedUser = await usersCollection.Find(info => info.user_name == userName).FirstOrDefaultAsync();
             if (retrievedUser != null) return retrievedUser.GetHashedPassword();
             else return null;
         }
@@ -111,12 +112,12 @@ public class DatabaseManager : MonoBehaviour
         }
     }
 
-    // Get Record of the player
-    public async Task<Record> GetRecord(string userName)
+    // Get Record of the player. This method will also be used by CurrentCoinAndScore class
+    public Record GetRecord(string userName)
     {
         try
         {
-            Record retrievedRecord = await recordsCollection.Find(info => info.GetUserName() == userName).FirstOrDefaultAsync();
+            Record retrievedRecord = recordsCollection.Find(info => info.user_name == userName).FirstOrDefault();
             if (retrievedRecord != null) return retrievedRecord;
             else return null;
         }
@@ -125,17 +126,37 @@ public class DatabaseManager : MonoBehaviour
         }
     }
 
-    // Check whether the player exist in database
-    private async Task<int> IsUserExist(string userName)
+    public async Task<List<Record>> GetTop50UserRecordAsync()
     {
         try
         {
-            var projection = Builders<User>.Projection.Include(info => info.GetUserName());
-            User retrievedUser = await usersCollection.Find(info => info.GetUserName() == userName).Project<User>(projection).FirstOrDefaultAsync();
+            var filter = Builders<Record>.Filter.Empty; // Empty filter for all documents
+            List<Record> retrievedRecordLost = await recordsCollection.Find(filter)
+                                                                      .Sort(Builders<Record>.Sort.Descending("point")) // Sort the user record my descending order.
+                                                                      .Limit(50) // Limit to 50 record
+                                                                      .ToListAsync();
+
+            if (retrievedRecordLost != null) return retrievedRecordLost;
+            else return null;
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
+    }
+
+    // Check whether the player exist in database
+    private async Task<int> IsUserExistAsync(string userName)
+    {
+        try
+        {
+            var projection = Builders<User>.Projection.Include(info => info.user_name);
+            User retrievedUser = await usersCollection.Find(info => info.user_name == userName).Project<User>(projection).FirstOrDefaultAsync();
             if (retrievedUser != null) return 1;
             else return 0;
         }
         catch (Exception ex) {
+            Debug.Log(ex);
             return -1;
         }
     }
@@ -174,7 +195,7 @@ public class DatabaseManager : MonoBehaviour
     public async Task<string> AuthenticateUser(string userName, string userAttemptedPassword)
     {
         // Return false if no such user exist.
-        string hashedPassword = await GetActualPassword(userName);
+        string hashedPassword = await GetActualPasswordAsync(userName);
         if (hashedPassword == null) return "Invalid username or password.";
         else if (hashedPassword == "") return "Error happened while accessing to database. Please try again.";
 
@@ -203,9 +224,9 @@ public class DatabaseManager : MonoBehaviour
         return "success";
     }
 
-    public async Task<string> RegisterUser(string userName, string userPassword)
+    public async Task<string> RegisterUserAsync(string userName, string userPassword)
     {
-        int result = await IsUserExist(userName);
+        int result = await IsUserExistAsync(userName);
         // Return false if user exist.
         if (result == 1) return "The user name has been registered.";
         else if (result == -1) return "Error happened while accessing to database. Please try again.";
@@ -238,18 +259,18 @@ public class DatabaseManager : MonoBehaviour
 
     }
 
-    public async Task<bool> UpdateRecord(string userName, int coins, int score, int point)
+    public async Task<bool> UpdateRecordAsync(string userName, int coins, int score, int point)
     {
         try
         {
             // Create a filter to find the record document for the specified player name.
-            var filter = Builders<Record>.Filter.Eq(r => r.GetUserName(), userName);
+            var filter = Builders<Record>.Filter.Eq(r => r.user_name, userName);
 
             // Create an update definition to set the coins and score.
             var update = Builders<Record>.Update
-                   .Set(r => r.GetCoins(), coins)
-                    .Set(r => r.GetScore(), score)
-                    .Set(r => r.GetPoint(), point);
+                   .Set(r => r.coins, coins)
+                    .Set(r => r.score, score)
+                    .Set(r => r.point, point);
 
             // Execute the update on the collection.
             var result = await recordsCollection.UpdateOneAsync(filter, update);

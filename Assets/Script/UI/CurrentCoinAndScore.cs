@@ -10,9 +10,9 @@ public class CurrentCoinAndScore : MonoBehaviour
     private static string user_name = "";
 
     // Get the player record from database for UI display and comparison of game result
-    public async void RetrieveRecordFromDataBase(string userName)
+    public static void RetrieveRecordFromDataBase(string userName)
     {
-        DatabaseManager.Record record = await DatabaseManager.Instance.GetRecord(userName);
+        DatabaseManager.Record record = DatabaseManager.Instance.GetRecord(userName);
         highest_coin = record.GetCoins();
         highest_score = record.GetScore();
         best_point = record.GetPoint();
@@ -20,12 +20,19 @@ public class CurrentCoinAndScore : MonoBehaviour
     }
 
     // Update record if the new point is higher than the best point after finishing one round of game.
-    public async void UpdateRecordToDataBase()
+    public static async void UpdateRecordToDataBase(int coin, int score, int point)
     {
-        int current_point = CollectableControl.GetCurrentCoin() + LevelScore.GetCurrentScore();
-        if (best_point < CollectableControl.GetCurrentCoin() + LevelScore.GetCurrentScore()) await DatabaseManager.Instance.UpdateRecord(user_name, CollectableControl.GetCurrentCoin(), LevelScore.GetCurrentScore(), current_point);
-
+        if (best_point < point) await DatabaseManager.Instance.UpdateRecordAsync(user_name, coin, score, point);
+        highest_coin = coin;
+        highest_score = score;
+        best_point = point;
     }
+
+    public static string GetUserName()
+    {
+        return user_name;
+    }
+
 
     public static int GetHighestCoin()
     {

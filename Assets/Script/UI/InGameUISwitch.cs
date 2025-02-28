@@ -37,8 +37,11 @@ public class InGameUISwitch : MonoBehaviour
     {
         inGameUI.SetActive(false);
 
-        match_coin_number.text = CollectableControl.GetCurrentCoin().ToString();
-        match_score_number.text = LevelScore.GetCurrentScore().ToString();
+        int match_coin = CollectableControl.GetCurrentCoin();
+        int match_score = LevelScore.GetCurrentScore();
+
+        match_coin_number.text = match_coin.ToString();
+        match_score_number.text = match_score.ToString();
 
         //Debug.Log($"CollectableControl.GetCurrentCoin().ToString(): {CollectableControl.GetCurrentCoin().ToString()}");
         //Debug.Log($"LevelScore.GetCurrentScore().ToString() {LevelScore.GetCurrentScore().ToString()}");
@@ -51,10 +54,14 @@ public class InGameUISwitch : MonoBehaviour
 
         if (CurrentCoinAndScore.GetBestPoint() > match_point)
         {
+            // Remove the "break record" congratulation.
             break_record_text.text = "";
         }
-
-        // TODO: Implement update new record to database.
+        else
+        {
+            // Update new record to database.
+            CurrentCoinAndScore.UpdateRecordToDataBase(match_coin, match_score, match_point);
+        }
 
         resultScreen.SetActive(true);
     }

@@ -15,4 +15,9 @@ public class MainMenuRecordDisplay : MonoBehaviour
         highest_score_text.text = CurrentCoinAndScore.GetHighestScore().ToString();
         best_point_text.text = CurrentCoinAndScore.GetBestPoint().ToString();
     }
+
+    void Start()
+    {
+        DisplayRecordInMenu();
+    }
 }

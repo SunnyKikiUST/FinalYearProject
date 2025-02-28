@@ -4254,6 +4254,7 @@ GameObject:
   m_Component:
   - component: {fileID: 278866445}
   - component: {fileID: 278866446}
+  - component: {fileID: 278866447}
   m_Layer: 0
   m_Name: BGM
   m_TagString: Untagged
@@ -4289,7 +4290,7 @@ AudioSource:
   m_audioClip: {fileID: 8300000, guid: 3d569bd2daa0da64bb3c7c6dd8eacba3, type: 3}
   m_Resource: {fileID: 8300000, guid: 3d569bd2daa0da64bb3c7c6dd8eacba3, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.2
+  m_Volume: 0
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -4373,6 +4374,19 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &278866447
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 278866444}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 476c5c49a03254647b94717308ed72ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ingame_bgm: {fileID: 278866446}
 --- !u!1001 &281373915
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -31513,6 +31527,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 463870548292868564, guid: a761d307f331aab4a87e6dcf64bf3b76, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2148860655618777295, guid: a761d307f331aab4a87e6dcf64bf3b76, type: 3}
       propertyPath: m_LocalPosition.y
       value: 3.0120933
