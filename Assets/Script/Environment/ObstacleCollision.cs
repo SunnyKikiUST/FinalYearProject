@@ -3,12 +3,13 @@ using System.Collections;
 
 public class ObstacleCollision : MonoBehaviour
 {
-
+    static private bool hasCollided = false; 
     // The script is attached to all obstacles.
     void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.tag == "Player")
+        if(other.gameObject.tag == "Player" && !hasCollided)
         {
+            hasCollided = true;
             // Stop character moving
             // other.gameObject.GetComponent<PlayerMovementWithMVEstimation>().enabled = false;
             other.gameObject.GetComponent<PlayerMovement>().StopOnCollision();
@@ -54,5 +55,10 @@ public class ObstacleCollision : MonoBehaviour
 
         // Switch UI to Result Screen
         InGameUISwitch.Instance.SwitchToResultScreen();
+    }
+
+    public static void ResetCollision()
+    {
+        hasCollided = false;
     }
 }

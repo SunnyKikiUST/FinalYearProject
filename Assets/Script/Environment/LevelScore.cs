@@ -38,8 +38,9 @@ public class LevelScore : MonoBehaviour
         return score;
     }
 
-    public static void ScoreToZero()
+    public static void ScoreToZeroAndStop()
     {
         score = 0;
+        start_counting = false;
     }
 }

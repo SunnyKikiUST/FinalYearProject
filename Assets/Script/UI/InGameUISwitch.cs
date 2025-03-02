@@ -51,7 +51,8 @@ public class InGameUISwitch : MonoBehaviour
 
 
         CollectableControl.CoinToZero();
-        LevelScore.ScoreToZero();
+        LevelScore.ScoreToZeroAndStop();
+        ObstacleCollision.ResetCollision();
 
         if (CurrentCoinAndScore.GetBestPoint() > match_point)
         {
