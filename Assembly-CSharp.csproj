@@ -70,6 +70,7 @@
     <Compile Include="Assets\Script\Database\DatabaseManager.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01_UGUI.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\SimpleScript.cs" />
+    <Compile Include="Assets\Script\UI\LevelStarter.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark04.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ChatController.cs" />
     <Compile Include="Assets\Script\Environment\GenerateLevel.cs" />
@@ -95,13 +96,13 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexColorCycler.cs" />
     <Compile Include="Assets\Script\Environment\CollectRotation.cs" />
     <Compile Include="Assets\Script\UI\CurrentCoinAndScore.cs" />
+    <Compile Include="Assets\Script\Environment\CleanUpGhostDynamicObs.cs" />
     <Compile Include="Assets\Script\Database\PlayerPreference.cs" />
     <Compile Include="Assets\Script\Environment\MovingObstacleMotion.cs" />
     <Compile Include="Assets\Script\Manu\MainMenu.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ObjectSpin.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_PhoneNumberValidator.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexJitter.cs" />
-    <Compile Include="Assets\Script\Environment\InGameBGMSetUp.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextConsoleSimulator.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TeleType.cs" />
     <Compile Include="Assets\Script\Environment\LevelScore.cs" />
@@ -116,6 +117,7 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ShaderPropAnimator.cs" />
     <Compile Include="Assets\Script\Player\PlayerMovement.cs" />
     <Compile Include="Assets\Script\Player\PlayerMovementWithMVEstimation.cs" />
+    <Compile Include="Assets\Script\Environment\InGameAudioController.cs" />
     <Compile Include="Assets\Script\Environment\ObstacleRemoval.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextInfoDebugTool.cs" />
   </ItemGroup>

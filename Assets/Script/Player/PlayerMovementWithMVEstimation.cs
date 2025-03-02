@@ -185,7 +185,7 @@ public class PlayerMovementWithMVEstimation : MonoBehaviour
             UnityEngine.Debug.Log("Is sliding");
 
             stateInfo = animator.GetCurrentAnimatorStateInfo(0);
-            if (stateInfo.normalizedTime >= 1f)
+            if (stateInfo.normalizedTime >= 1)
             {
                 isSliding = false;
                 Vector3 newCenter = capsuleCollider.center;

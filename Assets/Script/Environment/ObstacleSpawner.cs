@@ -27,7 +27,8 @@ public class ObstacleSpawner : MonoBehaviour
     private int previous_dy_obstacle_index = -1;
     private int previous_st_obstacle_index = -1;
 
-    private List<GameObject> obstacles = new List<GameObject>();
+    private List<GameObject> static_obstacles = new List<GameObject>();
+    private List<GameObject> dynamic_obstacles = new List<GameObject>();
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -38,6 +39,12 @@ public class ObstacleSpawner : MonoBehaviour
         spawn_points[2] = CreateSpawnPoint(new Vector3(right_path_x, 0f, 0f));
 
         StartCoroutine(SpawnObstacles());
+    }
+
+    private void Update()
+    {
+        static_obstacles.RemoveAll(item => item == null);
+        dynamic_obstacles.RemoveAll(item => item == null);
     }
 
     // Update is called once per frame
@@ -98,7 +105,7 @@ public class ObstacleSpawner : MonoBehaviour
         Vector3 spawn_position = spawn_points[lane_index].position;
         spawn_position.z = player.transform.position.z + spawn_distance; // Spawn in front of the character with distacne of spawn_distance by changing position.z
 
-        foreach (GameObject obstacle in obstacles)
+        foreach (GameObject obstacle in static_obstacles)
         {
             if (obstacle != null && Mathf.Abs(obstacle.transform.position.z - spawn_position.z) < min_restrict_distance_st)
             {
@@ -115,7 +122,7 @@ public class ObstacleSpawner : MonoBehaviour
         ObstacleCollision ObstacleCollisionClass = static_obstacle.AddComponent<ObstacleCollision>();
         //ObstacleCollisionClass.player = player;
         //ObstacleCollisionClass.character_model = character_model;
-        obstacles.Add(static_obstacle);
+        static_obstacles.Add(static_obstacle);
         Debug.Log($"Static obstacle spawned at: {spawn_position}");
     }
     void SpawnDynamicObstacle(int lane_index, int random_obstacle)
@@ -125,7 +132,7 @@ public class ObstacleSpawner : MonoBehaviour
         Vector3 spawn_position = lane_position + Vector3.forward * spawn_distance;
         spawn_position.z = player.transform.position.z + spawn_distance; // Spawn in front of the character with distacne of spawn_distance by changing position.z
 
-        foreach (GameObject obstacle in obstacles)
+        foreach (GameObject obstacle in static_obstacles)
         {
             if (obstacle != null && Vector3.Distance(obstacle.transform.position, spawn_position) < min_restrict_distance)
             {
@@ -137,18 +144,24 @@ public class ObstacleSpawner : MonoBehaviour
         GameObject selected_object = dynamic_obstacle_prefabs[random_obstacle];
         GameObject dynamic_obstacle = Instantiate(selected_object, spawn_position, selected_object.transform.rotation);
 
-        dynamic_obstacle.AddComponent<MovingObstacleMotion>().speed = dynamic_obstacle_speed;
+        dynamic_obstacle.AddComponent<MovingObstacleMotion>().StartMoving();
         dynamic_obstacle.AddComponent<ObstacleRemoval>();
 
-        ObstacleCollision ObstacleCollisionClass = dynamic_obstacle.AddComponent<ObstacleCollision>();
-        //ObstacleCollisionClass.player = player;
-        //ObstacleCollisionClass.character_model = character_model;
+        // Instead of attaching ObstacleCollision here, I have manually attached to desired gameobject, as it is not always the parent gameobject need the script.
+        //ObstacleCollision ObstacleCollisionClass = dynamic_obstacle.AddComponent<ObstacleCollision>();
+        dynamic_obstacles.Add(dynamic_obstacle);
         Debug.Log($"Dynamic obstacle spawned at: {spawn_position}");
     }
 
-    public List<GameObject> GetObstacles()
+    public List<GameObject> GetStaticObstacles()
     {
-        return obstacles;
+        return static_obstacles;
     }
+
+    public List<GameObject> GetDynamicObstacles()
+    {
+        return dynamic_obstacles;
+    }
+
 
 }

@@ -24,8 +24,6 @@ public class CoinSpawner : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        obstacles = GetComponent<ObstacleSpawner>().GetObstacles();
-
         Debug.Log($"CoinSpawner Starts");
         // Create spawn points 
         spawn_points[0] = CreateSpawnPoint(new Vector3(left_path_x, 0f, 0f));

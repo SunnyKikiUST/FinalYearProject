@@ -22,7 +22,6 @@ public class LeaderBoardListGeneration : MonoBehaviour
             int index = 0; // Index to store child names in the array
             foreach (Transform child in entry.transform)
             {
-                Debug.Log(child.name);
                 array[index] = child.name;
                 index++;
             }
@@ -32,12 +31,6 @@ public class LeaderBoardListGeneration : MonoBehaviour
             TMP_Text name_text = entry.transform.Find(array[1])?.GetChild(0).gameObject.GetComponent<TMP_Text>();
             TMP_Text coin_text = entry.transform.Find(array[2])?.GetChild(0).gameObject.GetComponent<TMP_Text>();
             TMP_Text score_text = entry.transform.Find(array[3])?.GetChild(0).gameObject.GetComponent<TMP_Text>();
-
-            Debug.Log(position_text);
-            Debug.Log(name_text);
-            Debug.Log(coin_text);
-            Debug.Log(score_text);
-
 
             if (position_text != null) position_text.text = (i + 1).ToString();
             if (name_text != null) name_text.text = list[i].user_name;

@@ -4,17 +4,17 @@ using System.Collections;
 public class ObstacleCollision : MonoBehaviour
 {
 
-
+    // The script is attached to all obstacles.
     void OnTriggerEnter(Collider other)
     {
         if(other.gameObject.tag == "Player")
         {
-            //Debug.Log($"collision happened: {other}");
-            //Debug.Log($"collision happened start from: {this}");
+            Debug.Log($"collision happened: {other}");
+            Debug.Log($"collision happened start from: {this}");
 
-            //player.GetComponent<PlayerMovementWithMVEstimation>().enabled = false;
 
             // Stop character moving
+            // other.gameObject.GetComponent<PlayerMovementWithMVEstimation>().enabled = false;
             other.gameObject.GetComponent<PlayerMovement>().enabled = false;
 
             // Perform animation 'Stumble Backwards'
@@ -25,12 +25,23 @@ public class ObstacleCollision : MonoBehaviour
             if (this.gameObject.GetComponent<MovingObstacleMotion>() != null)
                 this.gameObject.GetComponent<MovingObstacleMotion>().enabled = false;
 
+
             // Stop obstacle Spawner and Coin Spawner
-            GameObject.Find("LevelControl").GetComponent<ObstacleSpawner>().StopCoroutine();
-            GameObject.Find("LevelControl").GetComponent<ObstacleSpawner>().enabled = false;
+            ObstacleSpawner obstacle_spawner = GameObject.Find("LevelControl").GetComponent<ObstacleSpawner>();
+            obstacle_spawner.StopCoroutine();
+            // Stop all dynamic obstacles
+            foreach (GameObject dynamic_obstacle in obstacle_spawner.GetDynamicObstacles())
+            {
+                if(dynamic_obstacle == null) continue;
+                dynamic_obstacle.GetComponent<MovingObstacleMotion>()?.StopMoving();
+            }
+            obstacle_spawner.enabled = false;
             GameObject.Find("LevelControl").GetComponent<CoinSpawner>().StopCoroutine();
             GameObject.Find("LevelControl").GetComponent<CoinSpawner>().enabled = false;
             GameObject.Find("LevelControl").GetComponent<LevelScore>().enabled = false;
+            InGameAudioController controller = GameObject.Find("LevelControl/Audio/BGM").GetComponent<InGameAudioController>();
+            controller.StopInGameBGM();
+            controller.PlayGameOverFX();
 
             StartCoroutine(DelayedSwitchToResultScreen());
         }

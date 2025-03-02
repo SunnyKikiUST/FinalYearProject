@@ -40,9 +40,19 @@ public class PlayerMovement : MonoBehaviour
         // Assign the Rigidbody component 
         rb = GetComponent<Rigidbody>();
 
+        // Prevent tunneling while character is moving too fast
+        rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+
         // Get the Capsule Collider on the Player
         capsuleCollider = GetComponent<CapsuleCollider>();
 
+    }
+
+    // Used for physics based action, like moving character up under the board.
+    private void FixedUpdate()
+    {
+        //Vector3 Position = transform.position + Vector3.forward * player_speed * Time.fixedDeltaTime;
+        //rb.MovePosition(Position);
     }
 
     // Update is called once per frame
@@ -110,6 +120,7 @@ public class PlayerMovement : MonoBehaviour
     {
         isSliding = true;
 
+        // Change CapsuleCollider size while sliding
         Vector3 newCenter = capsuleCollider.center;
         newCenter.y = newCenter.y / 2;
         capsuleCollider.center = newCenter;
@@ -149,7 +160,7 @@ public class PlayerMovement : MonoBehaviour
             //StartCoroutine(EnableCollisionAfterCooldown());
 
             stateInfo = animator.GetCurrentAnimatorStateInfo(0);
-            if (stateInfo.normalizedTime >= 0.9f)
+            if (stateInfo.normalizedTime >= 1)
             {
                 isSliding = false;
                 Vector3 newCenter = capsuleCollider.center;
