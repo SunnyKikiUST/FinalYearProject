@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 
 using System.Collections.Generic;
+using MongoDB.Driver.Core.Misc;
 
 public class ObstacleSpawner : MonoBehaviour
 {
@@ -12,8 +13,9 @@ public class ObstacleSpawner : MonoBehaviour
     [SerializeField] private float spawn_interval = 0.1f;
     [SerializeField] private float dynamic_obstacle_speed = 10f;
     [SerializeField] private float spawn_distance = 140f; // Distance between character and dynamic obstacle while spawning
-    [SerializeField] private float min_restrict_distance = 70f; // Min distance that is not allowed between spawning dynamic obstacle and static obstacle in the same line
-    [SerializeField] private float min_restrict_distance_st = 10f; // Min distance that is not allowed between 2 static obstacles in the same line
+    [SerializeField] private float min_allow_distance = 70f; // Min distance that is not allowed between spawning dynamic obstacle and static obstacle in the same line
+    [SerializeField] private float min_allow_distance_dy = 35f; // Min distance that is not allowed between 2 dynamic obstacles in the same line
+    [SerializeField] private float min_allow_distance_st = 35f; // Min distance that is not allowed between 2 static obstacles in the same line
 
     [SerializeField] private float left_path_x = -3.75f;
     [SerializeField] private float middle_path_x = 0f;
@@ -52,11 +54,26 @@ public class ObstacleSpawner : MonoBehaviour
     {
         Debug.Log($"ObstacleSpawner is updating once per frame");
         Debug.Log($"Player is {player}");
+
+        //Ensure that spawning dynamic obstacle must be successful
+        bool isDynamicSuccessful = true;
+
         while (!shouldStopCoroutine)
         {
             int spawn_number = Random.Range(1, 3);
             int random_lane = Random.Range(0, spawn_points.Length);
-            int random_type = Random.Range(0, 2);
+
+            int random_type = 0;
+
+            if (isDynamicSuccessful)
+            {
+                random_type = Random.Range(0, 2);
+            }
+            // Try again spawning dynamic obstacle if last time is not successful.
+            else
+            {
+                random_type = 1;
+            }
 
             for (int i = 0; i < spawn_number; i++)
             {
@@ -73,10 +90,13 @@ public class ObstacleSpawner : MonoBehaviour
                     previous_st_obstacle_index = random_obstacle;
                     SpawnStaticObstacle(random_lane, random_obstacle);
                 }
+                // Spawn dynamic obstacle
                 else
                 {
                     int random_obstacle = Random.Range(0, dynamic_obstacle_prefabs.Length);
-                    SpawnDynamicObstacle(random_lane, random_obstacle);
+
+                    //Ensure that spawning dynamic obstacle must be successful
+                    isDynamicSuccessful = SpawnDynamicObstacle(random_lane, random_obstacle);
                 }
 
                 // Increase chance of getting 2 obstacle in same distance but in different paths
@@ -85,6 +105,7 @@ public class ObstacleSpawner : MonoBehaviour
 
             yield return new WaitForSeconds(spawn_interval);
         }
+
     }
 
     public void StopCoroutine()
@@ -99,6 +120,8 @@ public class ObstacleSpawner : MonoBehaviour
         return spawn_point.transform;
     }
 
+
+    // Spawn static obstacle
     void SpawnStaticObstacle(int lane_index, int random_obstacle)
     {
         Debug.Log($"Inside SpawnStaticObstacle");
@@ -107,9 +130,11 @@ public class ObstacleSpawner : MonoBehaviour
 
         foreach (GameObject obstacle in static_obstacles)
         {
-            if (obstacle != null && Mathf.Abs(obstacle.transform.position.z - spawn_position.z) < min_restrict_distance_st)
+            if (obstacle != null && 
+                Mathf.Abs(obstacle.transform.position.z - spawn_position.z) < min_allow_distance_st && 
+                spawn_position.x == obstacle.transform.position.x)
             {
-                Debug.Log("Static obstacle cannot spawn due to min_restrict_distance_st.");
+                Debug.Log("Static obstacle cannot spawn due to min_allow_distance_st.");
                 return;
             }
         }
@@ -119,13 +144,15 @@ public class ObstacleSpawner : MonoBehaviour
 
         static_obstacle.AddComponent<ObstacleRemoval>();
 
-        ObstacleCollision ObstacleCollisionClass = static_obstacle.AddComponent<ObstacleCollision>();
-        //ObstacleCollisionClass.player = player;
-        //ObstacleCollisionClass.character_model = character_model;
+        // Instead of attaching ObstacleCollision here, I have manually attached to desired gameobject, as it is not always the parent gameobject need the script.
+        //ObstacleCollision ObstacleCollisionClass = static_obstacle.AddComponent<ObstacleCollision>();
+
         static_obstacles.Add(static_obstacle);
         Debug.Log($"Static obstacle spawned at: {spawn_position}");
     }
-    void SpawnDynamicObstacle(int lane_index, int random_obstacle)
+
+    // Spawn dynamic obstacle
+    bool SpawnDynamicObstacle(int lane_index, int random_obstacle)
     {
         Debug.Log($"Inside SpawnDynamicObstacle");
         Vector3 lane_position = spawn_points[lane_index].position;
@@ -134,10 +161,21 @@ public class ObstacleSpawner : MonoBehaviour
 
         foreach (GameObject obstacle in static_obstacles)
         {
-            if (obstacle != null && Vector3.Distance(obstacle.transform.position, spawn_position) < min_restrict_distance)
+            if (obstacle != null && Vector3.Distance(obstacle.transform.position, spawn_position) < min_allow_distance)
             {
-                Debug.Log("Dynamic obstacle cannot spawn due to min_restrict_distance.");
-                return;
+                Debug.Log("Dynamic obstacle cannot spawn due to min_allow_distance.");
+                return false;
+            }
+        }
+
+        foreach (GameObject obstacle in dynamic_obstacles)
+        {
+            if (obstacle != null &&
+                Mathf.Abs(obstacle.transform.position.z - spawn_position.z) < min_allow_distance_dy &&
+                spawn_position.x == obstacle.transform.position.x)
+            {
+                Debug.Log("Static obstacle cannot spawn due to min_allow_distance_st.");
+                return false; ;
             }
         }
 
@@ -151,6 +189,8 @@ public class ObstacleSpawner : MonoBehaviour
         //ObstacleCollision ObstacleCollisionClass = dynamic_obstacle.AddComponent<ObstacleCollision>();
         dynamic_obstacles.Add(dynamic_obstacle);
         Debug.Log($"Dynamic obstacle spawned at: {spawn_position}");
+
+        return true;
     }
 
     public List<GameObject> GetStaticObstacles()

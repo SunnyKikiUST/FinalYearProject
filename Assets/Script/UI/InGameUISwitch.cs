@@ -43,11 +43,12 @@ public class InGameUISwitch : MonoBehaviour
         match_coin_number.text = match_coin.ToString();
         match_score_number.text = match_score.ToString();
 
-        //Debug.Log($"CollectableControl.GetCurrentCoin().ToString(): {CollectableControl.GetCurrentCoin().ToString()}");
-        //Debug.Log($"LevelScore.GetCurrentScore().ToString() {LevelScore.GetCurrentScore().ToString()}");
+        Debug.Log($"CollectableControl.GetCurrentCoin().ToString(): {CollectableControl.GetCurrentCoin().ToString()}");
+        Debug.Log($"LevelScore.GetCurrentScore().ToString() {LevelScore.GetCurrentScore().ToString()}");
 
         int match_point = CollectableControl.GetCurrentCoin() + LevelScore.GetCurrentScore();
         point.text = match_point.ToString();
+
 
         CollectableControl.CoinToZero();
         LevelScore.ScoreToZero();

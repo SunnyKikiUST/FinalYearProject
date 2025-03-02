@@ -9,11 +9,12 @@ public class LevelScore : MonoBehaviour
     [SerializeField] private GameObject score_display;
     [SerializeField] private float duration = 1f;
     private static int score = 0;
-
     private float timer = 0f;
+    private static bool start_counting = false;
+
     void Update()
     {
-        timer += Time.deltaTime;
+        if(start_counting) timer += Time.deltaTime;
 
         // Increase score for each full interval elapsed.
         if (timer >= duration)
@@ -25,6 +26,11 @@ public class LevelScore : MonoBehaviour
 
             score_display.GetComponent<TextMeshProUGUI>().text = score.ToString();
         }
+    }
+    
+    public static void StartCountingScore()
+    {
+        start_counting = true;
     }
 
     public static int GetCurrentScore()

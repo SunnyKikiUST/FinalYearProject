@@ -2801,7 +2801,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.031677805}
   m_AnchorMax: {x: 0.99000007, y: 0.9683223}
-  m_AnchoredPosition: {x: 2.9077759, y: -0.08920288}
+  m_AnchoredPosition: {x: 2.9077759, y: -0.08921051}
   m_SizeDelta: {x: -6.052, y: -0.17839}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &159997399
@@ -4708,7 +4708,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ingame_bgm: {fileID: 278866446}
-  coin_sound: {fileID: 0}
+  gameover_fx: {fileID: 1045377199}
 --- !u!1001 &281373915
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12148,11 +12148,11 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  spawn_interval: 1
+  spawn_interval: 0.1
   dynamic_obstacle_speed: 10
   spawn_distance: 140
-  min_restrict_distance: 70
-  min_restrict_distance_st: 10
+  min_allow_distance: 70
+  min_allow_distance_st: 70
   left_path_x: -3.75
   middle_path_x: 0
   right_path_x: 3.75
@@ -14732,7 +14732,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 114
-  m_CollisionDetection: 1
+  m_CollisionDetection: 2
 --- !u!114 &959235937
 MonoBehaviour:
   m_ObjectHideFlags: 0

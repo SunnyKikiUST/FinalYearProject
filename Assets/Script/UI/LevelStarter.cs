@@ -39,7 +39,10 @@ public class LevelStarter : MonoBehaviour
         count_down_2.SetActive(false);
         count_down_1.SetActive(false);
         fadein.SetActive(false);
+
         yield return new WaitForSeconds(1);
         count_down_exercise.SetActive(false);
+        // Start counting score !
+        LevelScore.StartCountingScore();
     }
 }

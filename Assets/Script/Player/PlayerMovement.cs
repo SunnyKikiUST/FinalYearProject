@@ -25,6 +25,7 @@ public class PlayerMovement : MonoBehaviour
 
     private bool isGrounded = false; // Track if the character is grounded
     private bool isSliding = false;
+    private bool stopOnCollision = false;
 
     private CapsuleCollider capsuleCollider;
 
@@ -64,14 +65,14 @@ public class PlayerMovement : MonoBehaviour
         if ( //move left
             Input.GetKey(KeyCode.A) &&
             current_path > 0
-            ) 
+            )
         {
             current_path--;
         }
         else if ( //move right
             Input.GetKey(KeyCode.D) &&
             current_path < 2
-            ) 
+            )
         {
             current_path++;
         }
@@ -131,30 +132,40 @@ public class PlayerMovement : MonoBehaviour
 
     private void ChangeAnimation(string animation, float cross_fade = 0.2f)
     {
-        if(current_animation != animation)
+        if (current_animation != animation)
         {
+            // When Running Slide animation is finished or is forced to changed to other animation, capsule sollider state need to be changed back.
+            if(current_animation == "Running Slide")
+            {
+                Vector3 newCenter = capsuleCollider.center;
+                newCenter.y = newCenter.y * 2;
+                capsuleCollider.center = newCenter;
+                capsuleCollider.height = capsuleCollider.height * 2;
+            }
+
             Debug.Log($"Changing animation from {current_animation} to {animation}");
             current_animation = animation;
+
+
             animator.CrossFade(animation, cross_fade, 0);
         }
     }
-    //Detect when the player lands on a ground object
+
+    //Detect when the player lands on a ground object.
+    //Probably because of the ground mesh, even the character is running on the ground, this method will weirdly periodically execute.
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Ground") && !isSliding) //Only execute the section code while character is not sliding
-       {
-            Debug.Log("Character has landed on the ground.");
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Ground") && !isSliding && !stopOnCollision) //Only execute the section code while character is not sliding
+        {
+            //Debug.Log("Character has landed on the ground.");
             isGrounded = true; // The character is now grounded
-
-            //stateInfo = animator.GetCurrentAnimatorStateInfo(0);
-            //if(stateInfo.IsName("Jump") &&
 
             ChangeAnimation("Fast Run");
         }
-        //Jump character is sliding and Jump, there will be no problem to execute the following code
+        // To prevent the weird execution and force sliding animation to change back to running.
         else if (isSliding)
         {
-            Debug.Log("Is sliding");
+            //Debug.Log("Is sliding");
 
             // Reactivate collision processing after the cooldown (equivalent for waiting sliding animation finish)
             //StartCoroutine(EnableCollisionAfterCooldown());
@@ -163,20 +174,16 @@ public class PlayerMovement : MonoBehaviour
             if (stateInfo.normalizedTime >= 1)
             {
                 isSliding = false;
-                Vector3 newCenter = capsuleCollider.center;
-                newCenter.y = newCenter.y * 2;
-                capsuleCollider.center = newCenter;
-                capsuleCollider.height = capsuleCollider.height * 2;
             }
         }
     }
 
     //private float getRunningSlideAnimationDuration()
     //{
-        // Get all the animation clips in the Animator
+    // Get all the animation clips in the Animator
     //    AnimationClip[] clips = animator.runtimeAnimatorController.animationClips;
 
-        // Find the animation clip named "RunningSlide"
+    // Find the animation clip named "RunningSlide"
     //    AnimationClip runningSlideClip = Array.Find(clips, clip => clip.name == "RunningSlide");
 
     //     if (runningSlideClip != null) return runningSlideClip.length;
@@ -210,7 +217,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (collision.gameObject.layer == LayerMask.NameToLayer("Ground"))
         {
-            Debug.Log("Character has left the ground.");
+            //Debug.Log("Character has left the ground.");
             isGrounded = false; // The character is no longer grounded
         }
     }
@@ -219,12 +226,25 @@ public class PlayerMovement : MonoBehaviour
     private void FasterAnimationTransition()
     {
         stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+        Debug.Log($"Current animation is: {current_animation}");
+
+        AnimatorClipInfo[] clipInfo = animator.GetCurrentAnimatorClipInfo(0);
+        if (clipInfo.Length > 0)
+        {
+            string currentClipName = clipInfo[0].clip.name;
+            Debug.Log("Current Animation Clip Name: " + currentClipName);
+        }
+
+        Debug.Log("stateInfo.normalizedTime: " + stateInfo.normalizedTime);
         if (stateInfo.IsName("Fast Run") || stateInfo.normalizedTime < 1f) return;
 
-        if (stateInfo.IsName("Running Slide"))
-        {
-            ChangeAnimation("Fast Run");
-        }
+        if (stateInfo.IsName("Running Slide")) ChangeAnimation("Fast Run");
+      
         else if (stateInfo.IsName("Jump")) ChangeAnimation("Fast Run");
+    }
+
+    public void StopOnCollision()
+    {
+        stopOnCollision = true;
     }
 }

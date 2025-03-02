@@ -9,13 +9,14 @@ public class ObstacleCollision : MonoBehaviour
     {
         if(other.gameObject.tag == "Player")
         {
-            Debug.Log($"collision happened: {other}");
-            Debug.Log($"collision happened start from: {this}");
-
-
             // Stop character moving
             // other.gameObject.GetComponent<PlayerMovementWithMVEstimation>().enabled = false;
+            other.gameObject.GetComponent<PlayerMovement>().StopOnCollision();
             other.gameObject.GetComponent<PlayerMovement>().enabled = false;
+
+
+            Debug.Log($"collision happened: {other}");
+            Debug.Log($"collision happened start from: {this}");
 
             // Perform animation 'Stumble Backwards'
             Transform child_transform = other.gameObject.transform.Find("Donna");
