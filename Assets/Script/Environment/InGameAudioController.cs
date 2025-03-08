@@ -5,6 +5,7 @@ public class InGameAudioController : MonoBehaviour
 
     [SerializeField] private AudioSource ingame_bgm;
     [SerializeField] private AudioSource gameover_fx;
+    [SerializeField] private AudioSource player_hurt_fx;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -21,6 +22,11 @@ public class InGameAudioController : MonoBehaviour
     public void StopInGameBGM()
     {
         ingame_bgm.Stop();
+    }
+
+    public void PlayHurtFX()
+    {
+        player_hurt_fx.Play();
     }
 
 }

@@ -11,6 +11,7 @@ public class ObstacleSpawner : MonoBehaviour
 
     [SerializeField] private Transform[] spawn_points = new Transform[3]; // Assign 3 spawn points
     [SerializeField] private float spawn_interval = 0.1f;
+    private float default_spawn_interval = 0.1f;
     [SerializeField] private float dynamic_obstacle_speed = 10f;
     [SerializeField] private float spawn_distance = 140f; // Distance between character and dynamic obstacle while spawning
     [SerializeField] private float min_allow_distance = 70f; // Min distance that is not allowed between spawning dynamic obstacle and static obstacle in the same line
@@ -31,9 +32,13 @@ public class ObstacleSpawner : MonoBehaviour
 
     private List<GameObject> static_obstacles = new List<GameObject>();
     private List<GameObject> dynamic_obstacles = new List<GameObject>();
+        
+    
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        default_spawn_interval = spawn_interval;
+
         Debug.Log($"ObstacleSpawner Starts");
         // Create spawn points 
         spawn_points[0] = CreateSpawnPoint(new Vector3(left_path_x, 0f, 0f));
@@ -43,8 +48,9 @@ public class ObstacleSpawner : MonoBehaviour
         StartCoroutine(SpawnObstacles());
     }
 
-    private void Update()
+    void Update()
     {
+        //Debug.Log($"fatigue spawn_interval:{spawn_interval}");
         static_obstacles.RemoveAll(item => item == null);
         dynamic_obstacles.RemoveAll(item => item == null);
     }
@@ -187,8 +193,9 @@ public class ObstacleSpawner : MonoBehaviour
 
         // Instead of attaching ObstacleCollision here, I have manually attached to desired gameobject, as it is not always the parent gameobject need the script.
         //ObstacleCollision ObstacleCollisionClass = dynamic_obstacle.AddComponent<ObstacleCollision>();
+
         dynamic_obstacles.Add(dynamic_obstacle);
-        Debug.Log($"Dynamic obstacle spawned at: {spawn_position}");
+        //Debug.Log($"Dynamic obstacle spawned at: {spawn_position}");
 
         return true;
     }
@@ -203,5 +210,14 @@ public class ObstacleSpawner : MonoBehaviour
         return dynamic_obstacles;
     }
 
+    //Increment is based on default_spawn_interval.
+    public void IncreaseSpawnIntervalFromDefault(float amount) //If amount is negative, then it means reduce intervel
+    {
+        spawn_interval = default_spawn_interval + amount;
+    }
 
+    public void SetBackToDefaultInterval()
+    {
+        spawn_interval = default_spawn_interval;
+    }
 }

@@ -6,6 +6,8 @@ using UnityEditor;
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float player_speed = 20;
+    [SerializeField] private float default_player_speed = 20; //new
+    [SerializeField] private float threshold_player_speed = 40;
     [SerializeField] private float horizontal_speed = 10f;
     [SerializeField] private float jump_force = 60f;
     [SerializeField] private float bufferCheckDistance = 0.1f;
@@ -14,11 +16,11 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float left_path_x = -3.75f;
     [SerializeField] private float middle_path_x = 0f;
     [SerializeField] private float right_path_x = 3.75f;
-    RaycastHit hit;
 
     private Animator animator;
     private string current_animation;
     private AnimatorStateInfo stateInfo;
+    private Vector3 last_position;
 
     //for jumping animation
     private Rigidbody rb;
@@ -32,7 +34,10 @@ public class PlayerMovement : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        default_player_speed = player_speed;
+
         animator = GetComponentInChildren<Animator>();
+
         //runningSlideDuration = getRunningSlideAnimationDuration();
 
         AnimatorClipInfo[] animatorinfo = animator.GetCurrentAnimatorClipInfo(0);
@@ -49,17 +54,10 @@ public class PlayerMovement : MonoBehaviour
 
     }
 
-    // Used for physics based action, like moving character up under the board.
-    private void FixedUpdate()
-    {
-        //Vector3 Position = transform.position + Vector3.forward * player_speed * Time.fixedDeltaTime;
-        //rb.MovePosition(Position);
-    }
-
     // Update is called once per frame
     void Update()
     {
-        Debug.DrawRay(new Vector3(transform.position.x, transform.position.y + bufferCheckDistance, transform.position.z), Vector3.down * bufferCheckDistance, Color.red);
+        last_position = transform.position;
         transform.Translate(Vector3.forward * player_speed * Time.deltaTime, Space.World);
 
         if ( //move left
@@ -90,9 +88,11 @@ public class PlayerMovement : MonoBehaviour
         {
             target_x = right_path_x;
         }
+
         Vector3 target_pos = new Vector3(target_x, transform.position.y, transform.position.z);
         // Move direction (i.e. move to different path)
         transform.position = Vector3.Lerp(transform.position, target_pos, horizontal_speed * Time.deltaTime);
+
 
         if (isGrounded && Input.GetKeyDown(KeyCode.Space))
         {
@@ -110,11 +110,12 @@ public class PlayerMovement : MonoBehaviour
 
     private void Jump()
     {
-        // Apply upward force for the jump
-        rb.AddForce(Vector3.up * jump_force, ForceMode.Impulse);
 
         // Trigger the "Jump" animation
         ChangeAnimation("Jump");
+
+        // Apply upward force for the jump
+        rb.AddForce(Vector3.up * jump_force, ForceMode.Impulse);
     }
 
     private void Slide()
@@ -135,7 +136,7 @@ public class PlayerMovement : MonoBehaviour
         if (current_animation != animation)
         {
             // When Running Slide animation is finished or is forced to changed to other animation, capsule sollider state need to be changed back.
-            if(current_animation == "Running Slide")
+            if(current_animation == "Running Slide") //new
             {
                 Vector3 newCenter = capsuleCollider.center;
                 newCenter.y = newCenter.y * 2;
@@ -163,7 +164,7 @@ public class PlayerMovement : MonoBehaviour
             ChangeAnimation("Fast Run");
         }
         // To prevent the weird execution and force sliding animation to change back to running.
-        else if (isSliding)
+        else if (isSliding) //new
         {
             //Debug.Log("Is sliding");
 
@@ -171,37 +172,13 @@ public class PlayerMovement : MonoBehaviour
             //StartCoroutine(EnableCollisionAfterCooldown());
 
             stateInfo = animator.GetCurrentAnimatorStateInfo(0);
-            if (stateInfo.normalizedTime >= 1)
+            if (stateInfo.normalizedTime >= 1) //new
             {
                 isSliding = false;
             }
         }
     }
 
-    //private float getRunningSlideAnimationDuration()
-    //{
-    // Get all the animation clips in the Animator
-    //    AnimationClip[] clips = animator.runtimeAnimatorController.animationClips;
-
-    // Find the animation clip named "RunningSlide"
-    //    AnimationClip runningSlideClip = Array.Find(clips, clip => clip.name == "RunningSlide");
-
-    //     if (runningSlideClip != null) return runningSlideClip.length;
-    //    else return -1f;
-    //}
-
-    //private IEnumerator EnableCollisionAfterCooldown() 
-    //{
-    //    yield return new WaitForSeconds(runningSlideDuration - durationMinimize);
-    //    isSliding = false;
-
-    //    Vector3 newCenter = capsuleCollider.center;
-    //    newCenter.y = newCenter.y * 2;
-    //    capsuleCollider.center = newCenter;
-    //    capsuleCollider.height = capsuleCollider.height * 2;
-
-    //    Debug.Log("Collision processing re-enabled.");
-    //}
 
     //Ensure the character stays grounded while on the ground object
     private void OnCollisionStay(Collision collision)
@@ -226,16 +203,16 @@ public class PlayerMovement : MonoBehaviour
     private void FasterAnimationTransition()
     {
         stateInfo = animator.GetCurrentAnimatorStateInfo(0);
-        Debug.Log($"Current animation is: {current_animation}");
+        //Debug.Log($"Current animation is: {current_animation}");
 
         AnimatorClipInfo[] clipInfo = animator.GetCurrentAnimatorClipInfo(0);
         if (clipInfo.Length > 0)
         {
             string currentClipName = clipInfo[0].clip.name;
-            Debug.Log("Current Animation Clip Name: " + currentClipName);
+            //Debug.Log("Current Animation Clip Name: " + currentClipName);
         }
 
-        Debug.Log("stateInfo.normalizedTime: " + stateInfo.normalizedTime);
+        //Debug.Log("stateInfo.normalizedTime: " + stateInfo.normalizedTime);
         if (stateInfo.IsName("Fast Run") || stateInfo.normalizedTime < 1f) return;
 
         if (stateInfo.IsName("Running Slide")) ChangeAnimation("Fast Run");
@@ -243,8 +220,49 @@ public class PlayerMovement : MonoBehaviour
         else if (stateInfo.IsName("Jump")) ChangeAnimation("Fast Run");
     }
 
-    public void StopOnCollision()
+    public void StopOnCollision() //new
     {
         stopOnCollision = true;
     }
+
+    public float IncreaseSpeedFromDefault(float percentage) //new
+    {
+
+        //Debug.Log($"fatigue increased speed percentage: {percentage}");
+        float actual_percentage = percentage / 100; // e.g. 5% -> 0.05
+        float result = default_player_speed + default_player_speed * actual_percentage;
+
+        //Debug.Log($"fatigue increased speed actual_percentage: {actual_percentage}");
+        //Debug.Log($"fatigue increased speed default_player_speed * actual_percentage: {default_player_speed * actual_percentage}");
+        //Debug.Log($"fatigue increased speed result: {result}");
+
+        // Maximum speed should not exceed threshold.
+        // If the amount of increment cause the spped to exceed over threshold_player_speed, then reduce the percentage.
+        if (result > threshold_player_speed)
+        {
+            player_speed = threshold_player_speed;
+            //Debug.Log($"fatigue increased speed player_speed 111:{player_speed}");
+            return percentage -= 5;
+        }
+        else
+        {
+            player_speed = result;
+            //Debug.Log($"fatigue increased speed player_speed 222:{player_speed}");
+            return percentage;
+        }
+
+    }
+
+    public void DecreaseSpeedFromDefault(float percentage) //new
+    {
+        float actual_percentage = percentage / 100; // e.g. 5% -> 0.05
+        player_speed = default_player_speed - default_player_speed * actual_percentage;
+        Debug.Log($"fatigue Decrease speed to:{player_speed}");
+    }
+
+    public void SetBackToDefaultSpeed() //new
+    {
+        player_speed = default_player_speed;
+    }
+    
 }

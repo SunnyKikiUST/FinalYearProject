@@ -20,7 +20,6 @@ public class CoinSpawner : MonoBehaviour
     [SerializeField] private GameObject player;
     [SerializeField] private GameObject character_model;
 
-    private List<GameObject> obstacles = null;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -45,17 +44,9 @@ public class CoinSpawner : MonoBehaviour
             spawn_position.z = player.transform.position.z + spawn_distance; // Spawn in front of the character with distacne of spawn_distance by changing position.z
             spawn_position.y = 1f;
 
-
-            foreach (GameObject obstacle in obstacles)
-            {
-                if (obstacle != null && Vector3.Distance(obstacle.transform.position, spawn_position) < min_restrict_distance)
-                {
-                    Debug.Log("Dynamic obstacle cannot spawn due to min_restrict_distance.");
-                    continue;
-                }
-            }
-
             GameObject new_coin = Instantiate(coin, spawn_position, coin.transform.rotation);
+            //ObstacleRemoval class can also used by coin.
+            new_coin.AddComponent<ObstacleRemoval>();
 
             yield return new WaitForSeconds(spawn_interval);
         }

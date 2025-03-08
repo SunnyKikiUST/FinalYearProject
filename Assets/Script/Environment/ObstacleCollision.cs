@@ -3,13 +3,35 @@ using System.Collections;
 
 public class ObstacleCollision : MonoBehaviour
 {
-    static private bool hasCollided = false; 
+    static private bool playerHasCollided = false;
+    static private bool canGameOver = false;
+    private bool obstacleHasCollided = false;
+    private bool obstacleHasPassThroughPlayer = false;
+
+    private ParticleSystem smoke_VFX;
+
+    [SerializeField] private GameObject player;
+
+    private InGameAudioController controller;
+    private void Start()
+    {
+        player = GameObject.Find("Player");
+
+        smoke_VFX = player.transform.Find("smoke_VFX")?.gameObject.GetComponent<ParticleSystem>();
+
+        controller = GameObject.Find("LevelControl/Audio/BGM").GetComponent<InGameAudioController>();
+    }
+
     // The script is attached to all obstacles.
     void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.tag == "Player" && !hasCollided)
+        if(other.gameObject.tag == "Player" && !playerHasCollided && canGameOver)
         {
-            hasCollided = true;
+            // To prevent other obstacle to collide with player again.
+            playerHasCollided = true;
+            // To prevent the action of PassThroughObstacle() in Update()
+            obstacleHasCollided = true;
+
             // Stop character moving
             // other.gameObject.GetComponent<PlayerMovementWithMVEstimation>().enabled = false;
             other.gameObject.GetComponent<PlayerMovement>().StopOnCollision();
@@ -38,14 +60,40 @@ public class ObstacleCollision : MonoBehaviour
                 dynamic_obstacle.GetComponent<MovingObstacleMotion>()?.StopMoving();
             }
             obstacle_spawner.enabled = false;
-            GameObject.Find("LevelControl").GetComponent<CoinSpawner>().StopCoroutine();
-            GameObject.Find("LevelControl").GetComponent<CoinSpawner>().enabled = false;
-            GameObject.Find("LevelControl").GetComponent<LevelScore>().enabled = false;
+            GameObject level_control = GameObject.Find("LevelControl");
+            level_control.GetComponent<CoinSpawner>().StopCoroutine();
+            level_control.GetComponent<CoinSpawner>().enabled = false;
+            level_control.GetComponent<LevelScore>().enabled = false;
             InGameAudioController controller = GameObject.Find("LevelControl/Audio/BGM").GetComponent<InGameAudioController>();
             controller.StopInGameBGM();
             controller.PlayGameOverFX();
 
             StartCoroutine(DelayedSwitchToResultScreen());
+        }
+        // Increase exhaustion score in fatigue monitoring system.
+        else if (!canGameOver)
+        {
+            if(smoke_VFX != null) smoke_VFX.Play();
+            controller.PlayHurtFX();
+            gameObject.SetActive(false);
+            FatigueMonitoringSystem.Instance.FailObstacle();
+        }
+    }
+
+    private void Update()
+    {
+        if(
+            gameObject.transform.position.z < player.transform.position.z && 
+            !obstacleHasCollided &&
+            !obstacleHasPassThroughPlayer &&
+            gameObject.GetComponent<ObstacleRemoval>() != null
+            )
+        {
+            obstacleHasPassThroughPlayer = true;
+
+            //Debug.Log($"fatigue 123 PassThroughObstacle gameObject.transform.position.z from ObstacleCollision: {gameObject.transform.position.z}");
+
+            FatigueMonitoringSystem.Instance.PassThroughObstacle();
         }
     }
 
@@ -59,6 +107,17 @@ public class ObstacleCollision : MonoBehaviour
 
     public static void ResetCollision()
     {
-        hasCollided = false;
+        playerHasCollided = false;
+        canGameOver = false;
+    }
+
+    public static void CanGameOver()
+    {
+        canGameOver = true;
+    }
+
+    public static void CannotGameOver()
+    {
+        canGameOver = false;
     }
 }
