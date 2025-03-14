@@ -9,12 +9,13 @@ public class FatigueMonitoringSystem : MonoBehaviour
     [SerializeField] private float exhaustion_score = 0f;
     private float previous_exhaustion_score = 0f;
     [SerializeField] private float exhaustion_increase_rate = 10f;
+    [SerializeField] private float exhaustion_increase_rate_exercise = 15f;
     [SerializeField] private float exhaustion_decrease_rate = 3f;
+    [SerializeField] private float exhaustion_decrease_rate_exercise = 5f;
+    [SerializeField] private float increase_diff_time_threahold = 3f; // time threshoold for increase time
 
     [Header("Performance Tracking")]
     [SerializeField] private int consecutive_obstacles_passed = 0;
-    [SerializeField] private float exercise_challenge_time = 0f;
-    [SerializeField] private bool isInExerciseChallenge = false;
 
     [Header("UI Element")]
     [SerializeField] private TextMeshProUGUI exhaustion_score_text;
@@ -54,16 +55,6 @@ public class FatigueMonitoringSystem : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (isInExerciseChallenge)
-        {
-            exercise_challenge_time += Time.deltaTime;
-
-            if(exercise_challenge_time > 5f)
-            {
-                FailExerciseChallenge();
-            }
-        }
-
         // GameOver due to high exhaustion level
         if(exhaustion_score >= 100)
         {
@@ -78,7 +69,7 @@ public class FatigueMonitoringSystem : MonoBehaviour
         if(exhaustion_score >= 0 && exhaustion_score <= 20)
         {
             difficulty_increase_timer += Time.deltaTime;
-            if(difficulty_increase_timer >= 3f) // After 10 second
+            if(difficulty_increase_timer >= increase_diff_time_threahold) // After increase_diff_time_threahold second
             {
                 Debug.Log($"fatigue increased speed increase difficulty");
                 shouldIncreaseDifficulty = true;
@@ -110,37 +101,17 @@ public class FatigueMonitoringSystem : MonoBehaviour
     }
 
     // Not yet used
-    public void StartExerciseChallenge()
-    {
-        isInExerciseChallenge = true;
-        exercise_challenge_time = 0f;
-    }
-
-    // Not yet used
     public void CompleteExerciseChallenge()
     {
-        if (isInExerciseChallenge)
-        {
-            isInExerciseChallenge = false;
-
-            if(exercise_challenge_time <= 3f)
-            {
-                // Player comlpeted exericse quickly -> less exhaustion 
-                exhaustion_score -= exhaustion_decrease_rate;
-            }
-
-        }
+        // Player comlpeted exericse quickly -> less exhaustion 
+        exhaustion_score -= exhaustion_decrease_rate_exercise;
     }
 
     // Not yet used
     public void FailExerciseChallenge()
     {
-        if (isInExerciseChallenge)
-        {
-            isInExerciseChallenge = false;
-            exhaustion_score += exhaustion_increase_rate;
+            exhaustion_score += exhaustion_increase_rate_exercise;
             UpdateDifficulty();
-        }
     }
 
     // Helper to determine previous exhaustion category
@@ -192,7 +163,7 @@ public class FatigueMonitoringSystem : MonoBehaviour
                 obstacle_spawner.SetBackToDefaultInterval();
             }
 
-            // Increase difficulty every 10 seconds
+            // Increase difficulty 
             if (shouldIncreaseDifficulty)
             {
                 Debug.Log("fatigue player_speed increasing difficulty");

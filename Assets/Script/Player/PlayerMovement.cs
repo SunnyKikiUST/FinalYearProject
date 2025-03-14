@@ -10,7 +10,6 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float threshold_player_speed = 40;
     [SerializeField] private float horizontal_speed = 10f;
     [SerializeField] private float jump_force = 60f;
-    [SerializeField] private float bufferCheckDistance = 0.1f;
 
     private int current_path = 1;
     [SerializeField] private float left_path_x = -3.75f;
@@ -19,14 +18,17 @@ public class PlayerMovement : MonoBehaviour
 
     private Animator animator;
     private string current_animation;
+    private string previous_animation = "Fast Run";
     private AnimatorStateInfo stateInfo;
     private Vector3 last_position;
+    private Vector3 forward_size = Vector3.forward;
 
     //for jumping animation
     private Rigidbody rb;
 
-    private bool isGrounded = false; // Track if the character is grounded
+    private bool isGrounded = true; // Track if the character is grounded
     private bool isSliding = false;
+    private bool havingJumpingAnimation = false;
     private bool stopOnCollision = false;
 
     private CapsuleCollider capsuleCollider;
@@ -58,7 +60,7 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         last_position = transform.position;
-        transform.Translate(Vector3.forward * player_speed * Time.deltaTime, Space.World);
+        transform.Translate(forward_size * player_speed * Time.deltaTime, Space.World);
 
         if ( //move left
             Input.GetKey(KeyCode.A) &&
@@ -94,22 +96,23 @@ public class PlayerMovement : MonoBehaviour
         transform.position = Vector3.Lerp(transform.position, target_pos, horizontal_speed * Time.deltaTime);
 
 
-        if (isGrounded && Input.GetKeyDown(KeyCode.Space))
+        if (isGrounded && Input.GetKeyDown(KeyCode.Space)) //new
         {
             Jump();
         }
-        else if (isGrounded && Input.GetKeyDown(KeyCode.LeftControl))
+        else if (isGrounded && !isSliding && Input.GetKeyDown(KeyCode.LeftControl))
         {
             Slide();
         }
 
-        //Sometimes OnCollisionEnter is slower to execute again!
-        FasterAnimationTransition();
-
+        FastAnimationTransition();
     }
 
     private void Jump()
     {
+        // To prevent double Jump
+        havingJumpingAnimation = true; //new
+        isGrounded = false;
 
         // Trigger the "Jump" animation
         ChangeAnimation("Jump");
@@ -121,7 +124,6 @@ public class PlayerMovement : MonoBehaviour
     private void Slide()
     {
         isSliding = true;
-
         // Change CapsuleCollider size while sliding
         Vector3 newCenter = capsuleCollider.center;
         newCenter.y = newCenter.y / 2;
@@ -142,10 +144,16 @@ public class PlayerMovement : MonoBehaviour
                 newCenter.y = newCenter.y * 2;
                 capsuleCollider.center = newCenter;
                 capsuleCollider.height = capsuleCollider.height * 2;
+
+                // While changing animation from sliding, make sure the sliding state is changed also.
+                isSliding = false;
             }
 
-            Debug.Log($"Changing animation from {current_animation} to {animation}");
+            Debug.Log($"test Changing animation from {current_animation} to {animation}");
+
+            previous_animation = current_animation;
             current_animation = animation;
+
 
 
             animator.CrossFade(animation, cross_fade, 0);
@@ -158,49 +166,14 @@ public class PlayerMovement : MonoBehaviour
     {
         if (collision.gameObject.layer == LayerMask.NameToLayer("Ground") && !isSliding && !stopOnCollision) //Only execute the section code while character is not sliding
         {
-            //Debug.Log("Character has landed on the ground.");
+            //Debug.Log("test Character has landed on the ground.");
             isGrounded = true; // The character is now grounded
-
-            ChangeAnimation("Fast Run");
-        }
-        // To prevent the weird execution and force sliding animation to change back to running.
-        else if (isSliding) //new
-        {
-            //Debug.Log("Is sliding");
-
-            // Reactivate collision processing after the cooldown (equivalent for waiting sliding animation finish)
-            //StartCoroutine(EnableCollisionAfterCooldown());
-
-            stateInfo = animator.GetCurrentAnimatorStateInfo(0);
-            if (stateInfo.normalizedTime >= 1) //new
-            {
-                isSliding = false;
-            }
         }
     }
 
-
-    //Ensure the character stays grounded while on the ground object
-    private void OnCollisionStay(Collision collision)
-    {
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Ground"))
-        {
-            isGrounded = true; // The character is still grounded
-        }
-    }
-
-    // Detect when the player leaves the ground object
-    private void OnCollisionExit(Collision collision)
-    {
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Ground"))
-        {
-            //Debug.Log("Character has left the ground.");
-            isGrounded = false; // The character is no longer grounded
-        }
-    }
 
     //To deal with the problem that animation stop after finishing Running Slide/Jump and no animation follows
-    private void FasterAnimationTransition()
+    private void FastAnimationTransition()
     {
         stateInfo = animator.GetCurrentAnimatorStateInfo(0);
         //Debug.Log($"Current animation is: {current_animation}");
@@ -215,9 +188,20 @@ public class PlayerMovement : MonoBehaviour
         //Debug.Log("stateInfo.normalizedTime: " + stateInfo.normalizedTime);
         if (stateInfo.IsName("Fast Run") || stateInfo.normalizedTime < 1f) return;
 
-        if (stateInfo.IsName("Running Slide")) ChangeAnimation("Fast Run");
-      
-        else if (stateInfo.IsName("Jump")) ChangeAnimation("Fast Run");
+        if (stateInfo.IsName("Running Slide"))
+        {
+            isSliding = false; //new
+            ChangeAnimation("Fast Run");
+        }
+
+        // !isSliding is used here, it is because sometimes when character lands on ground and click slide instantly, 
+        // it may become Jump -> Slide -> Fast Run (instantly behind Slide), casuing no Slide can be seen. Hence, the varaible is to make sure that character enter sliding animation.
+
+        else if (stateInfo.IsName("Jump") && !isSliding && havingJumpingAnimation) //new
+        {
+            havingJumpingAnimation = false;
+            ChangeAnimation("Fast Run");
+        }
     }
 
     public void StopOnCollision() //new
@@ -265,4 +249,14 @@ public class PlayerMovement : MonoBehaviour
         player_speed = default_player_speed;
     }
     
+    public void PauseMovementState() //new
+    {
+        // Stop moving forward
+        forward_size = Vector3.zero;
+    }
+
+    public void ResumeMovementState() //new
+    {
+        forward_size = Vector3.forward;
+    }
 }

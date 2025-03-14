@@ -9,7 +9,6 @@ public class CoinSpawner : MonoBehaviour
     [SerializeField] private Transform[] spawn_points = new Transform[3]; // Assign 3 spawn points
     [SerializeField] private float spawn_interval = 0.5f;
     [SerializeField] private float spawn_distance = 140f; // Distance between character and dynamic obstacle while spawning
-    [SerializeField] private float min_restrict_distance = 5f; 
 
     [SerializeField] private float left_path_x = -3.75f;
     [SerializeField] private float middle_path_x = 0f;
@@ -18,12 +17,11 @@ public class CoinSpawner : MonoBehaviour
     private bool shouldStopCoroutine = false;
 
     [SerializeField] private GameObject player;
-    [SerializeField] private GameObject character_model;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        Debug.Log($"CoinSpawner Starts");
+        //Debug.Log($"CoinSpawner Starts");
         // Create spawn points 
         spawn_points[0] = CreateSpawnPoint(new Vector3(left_path_x, 0f, 0f));
         spawn_points[1] = CreateSpawnPoint(new Vector3(middle_path_x, 0f, 0f));
@@ -37,7 +35,7 @@ public class CoinSpawner : MonoBehaviour
     {
         while (!shouldStopCoroutine)
         {
-            Debug.Log($"Sppawning Coin");
+            //Debug.Log($"Spawning Coin");
             int random_lane = Random.Range(0, spawn_points.Length);
 
             Vector3 spawn_position = spawn_points[random_lane].position;
@@ -63,6 +61,7 @@ public class CoinSpawner : MonoBehaviour
         spawn_point.transform.position = position;
         return spawn_point.transform;
     }
+
 }
 
 
