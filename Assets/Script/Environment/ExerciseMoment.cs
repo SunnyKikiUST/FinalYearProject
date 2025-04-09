@@ -10,13 +10,16 @@ using System.Collections;
 public class ExerciseMoment : MonoBehaviour
 {
     [SerializeField] private GameObject player;
+    [SerializeField] private PlayerMovementWithMVEstimationTest player_movement;
     [SerializeField] private GameObject ExerciseChallenge;
 
     [SerializeField] private GameObject pushUpUI;
     [SerializeField] private GameObject bridgeUI;
 
-    // Represent the camera streaming in non exercise cha;llenge in game. Have a raw image that is attached to the game object.  
+    // Represent the camera streaming in non exercise challenge in game. Have a raw image that is attached to the game object.  
     [SerializeField] private GameObject ingameRealTimeStreaming;
+    [SerializeField] private RawImage pushup_real_time_streaming;
+    [SerializeField] private RawImage bridge_real_time_streaming;
 
     // the count here mean total push up time that has done
     [SerializeField] private TextMeshProUGUI pushUpUI_count;
@@ -53,11 +56,12 @@ public class ExerciseMoment : MonoBehaviour
     private PauseInGameMoment pausor;
     private bool isTriggered = false;
     private bool inExerciseChallenge = false;
+    private bool exChallengeSignalReceivedByPoseModel = false;
 
     private int test_randowmDetermination = 0;
 
-    private int push_up_time = 0; // Number of time to do push up
-    private int bridge_time = 0; // Total time (in second) for holding the bridge posture
+    private float push_up_time = 0; // Number of time to do push up
+    private float bridge_time = 0; // Total time (in second) for holding the bridge posture
     private int remaining_warning_time = 3;
 
     [SerializeField] private float remaining_push_up_time = 8f;
@@ -68,6 +72,7 @@ public class ExerciseMoment : MonoBehaviour
     {
         GameObject level_control = GameObject.Find("LevelControl");
         pausor = level_control.GetComponent<PauseInGameMoment>();
+        player_movement = player.GetComponent<PlayerMovementWithMVEstimationTest>();
         fatigueMonitoringSystem = level_control.GetComponent<FatigueMonitoringSystem>();
     }
 
@@ -75,12 +80,17 @@ public class ExerciseMoment : MonoBehaviour
 
     private void Update()
     {
-        if (inExerciseChallenge)
+        //inExerciseChallenge: Trigger Collision already, exChallengeSignalReceivedByPoseModel: Pose model is prepared to capture exercise posture
+        if (inExerciseChallenge && player_movement.HaveChallengeSignalReceivedByPoseModel())
         {
             if (test_randowmDetermination == 0)
             {
                 Debug.Log($"test push up time: {push_up_time}");
                 Debug.Log($"test remaining time to do: {remaining_push_up_time}");
+                push_up_time = player_movement.GetPushUpTotalTime(); // Get the real time time
+                Debug.Log($" push_up_time: {push_up_time}");
+                pushup_real_time_streaming.texture = player_movement.ReadTexture(); // Read newest frame from the pose model
+
 
                 remaining_push_up_time -= Time.unscaledDeltaTime;
 
@@ -93,11 +103,6 @@ public class ExerciseMoment : MonoBehaviour
                     fatigueMonitoringSystem.CompleteExerciseChallenge();
 
                     StartCoroutine(CountDown(true));
-                }
-                else if (Input.GetKeyDown(KeyCode.F)) //not yet implement TCP
-                {
-                    push_up_time++;
-                    if(push_up_time != push_up_require) one_succeed.Play();
                 }
 
                 //Update UI
@@ -122,7 +127,9 @@ public class ExerciseMoment : MonoBehaviour
             }
             else
             {
+
                 remaining_bridge_time -= Time.unscaledDeltaTime;
+                bridge_real_time_streaming.texture = player_movement.ReadTexture();  // Read newest frame from the pose model
 
                 if (bridge_time >= bridge_require) // success after doing required seconds of bridge and keep the game going 
                 {
@@ -134,11 +141,7 @@ public class ExerciseMoment : MonoBehaviour
 
                     StartCoroutine(CountDown(true));
                 }
-                else if (Input.GetKeyDown(KeyCode.F)) //not yet implement TCP
-                {
-                    bridge_time++;
-                    if (bridge_time != bridge_require) one_succeed.Play();
-                }
+
 
                 //Update UI
                 bridgeUI_count.text = remaining_bridge_time.ToString("F1");
@@ -168,9 +171,9 @@ public class ExerciseMoment : MonoBehaviour
         {
             isTriggered = true;
 
-            //.......
+            player_movement.ChangeToExerciseChallenge();
             pausor.PauseInGameState();
-            ingameRealTimeStreaming.SetActive(false);
+            ingameRealTimeStreaming.SetActive(false); 
             ExerciseChallenge.SetActive(true);
 
             // If the challenge is push up
@@ -194,6 +197,8 @@ public class ExerciseMoment : MonoBehaviour
     IEnumerator CountDown(bool isSucceeded)
     {
         gameRestartCountingExercise.SetActive(true);
+        ingameRealTimeStreaming.SetActive(true);// Let the camera in normal running mode be active again
+        push_up_time = 0;
 
         if (isSucceeded) {
             success_image.SetActive(true);
@@ -239,6 +244,7 @@ public class ExerciseMoment : MonoBehaviour
 
         gameRestartCountingExercise.SetActive(false);
 
+        player_movement.ChangeFromExerciseChallenge();
         pausor.ResumeInGameState();
     }
 }

@@ -16,7 +16,6 @@ import struct
 import threading
 from queue import Queue
 
-
 HOST = '127.0.0.1'
 PORT = 65451
 
@@ -62,7 +61,10 @@ def run(poseweights="yolov7-w6-pose.pt",source="0",device='cpu',view_img=False,
     names = model.module.names if hasattr(model, 'module') else model.names  # get class names
    
     if source.isnumeric() :    
-        cap = cv2.VideoCapture(int(source), cv2.CAP_MSMF)    #pass video to videocapture object
+        #cap = cv2.VideoCapture(int(source), cv2.CAP_MSMF)    #pass video to videocapture object
+        cap = cv2.VideoCapture(int(source))
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1404)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
     else :
         cap = cv2.VideoCapture(source)    #pass video to videocapture object
    
@@ -82,8 +84,19 @@ def run(poseweights="yolov7-w6-pose.pt",source="0",device='cpu',view_img=False,
         # threading.Thread(target=listen_for_exit_signal, args=(client_socket,), daemon = True) # Sunny
 
         frame_width = int(cap.get(3)) #get video frame width
-        if frame_width > 800: # Sunny
-          frame_width = 800
+        frame_height = int(cap.get(4)) #get video frame height
+        # frame_height = 1088
+        # frame_width = 1088
+        #if frame_width >= 720: # Sunny
+        print(f"frame_height: {frame_height}")
+        print(f"frame_width: {frame_width}")
+        
+        #vid_write_image = letterbox(cap.read()[1], (frame_height, frame_width), stride=64, auto=True)[0] #init videowriter
+        # resize_height, resize_width = vid_write_image.shape[:2]
+        # out_video_name = f"{source.split('/')[-1].split('.')[0]}"
+        # out = cv2.VideoWriter(f"1280x720_test.mp4",
+        #                     cv2.VideoWriter_fourcc(*'mp4v'), 30,
+        #                     (frame_width, frame_height))
 
         while(cap.isOpened): #loop until cap opened or video not complete
             #print("Frame {} Processing".format(frame_count+1)) # Sunny
@@ -92,12 +105,12 @@ def run(poseweights="yolov7-w6-pose.pt",source="0",device='cpu',view_img=False,
             if should_exit:
                 print("Game termination")
                 break
-
+            frame = cv2.resize(frame, (640, 420))
             if ret: #if success is true, means frame exist (remove by Sunny)
                 orig_image = frame #store frame
                 image = cv2.cvtColor(orig_image, cv2.COLOR_BGR2RGB) #convert frame to RGB
-                image = letterbox(image, (frame_width), stride=64, auto=True)[0]
-                image_ = image.copy()
+                #image = letterbox(image, (frame_height, frame_width), stride=64, auto=True)[0]
+                #image_ = image.copy()
                 image = transforms.ToTensor()(image)
                 image = torch.tensor(np.array([image.numpy()]))
             
@@ -105,14 +118,14 @@ def run(poseweights="yolov7-w6-pose.pt",source="0",device='cpu',view_img=False,
                 image = image.float() #convert image to float precision (cpu)
                 start_time = time.time() #start time for fps calculation
             
-                with torch.no_grad():  #get predictions
-                    output_data, _ = model(image)
-                output_data = non_max_suppression_kpt(output_data,   #Apply non max suppression
-                                            0.25,   # Conf. Threshold.
-                                            0.65, # IoU Threshold.
-                                            nc=model.yaml['nc'], # Number of classes.
-                                            nkpt=model.yaml['nkpt'], # Number of keypoints.
-                                            kpt_label=True)
+                # with torch.no_grad():  #get predictions
+                #     output_data, _ = model(image)
+                # output_data = non_max_suppression_kpt(output_data,   #Apply non max suppression
+                #                             0.25,   # Conf. Threshold.
+                #                             0.65, # IoU Threshold.
+                #                             nc=model.yaml['nc'], # Number of classes.
+                #                             nkpt=model.yaml['nkpt'], # Number of keypoints.
+                #                             kpt_label=True)
             
                 #output = output_to_keypoint(output_data)
                 
@@ -121,17 +134,17 @@ def run(poseweights="yolov7-w6-pose.pt",source="0",device='cpu',view_img=False,
                 im0 = im0.cpu().numpy().astype(np.uint8)
                 
                 im0 = cv2.cvtColor(im0, cv2.COLOR_RGB2BGR) #reshape image format to (BGR)
-            
-                cv2.imshow("YOLOv7 Pose Estimation Demo", im0)
+        
+                cv2.imshow("YOLOv7 Pose Estimation Demo", orig_image)
                 cv2.waitKey(1)  # 1 millisecond
 
-                
-                end_time = time.time()  #Calculatio for FPS
-                print(f"The time spent in this loop is: {end_time - start_time}")
+                #out.write(frame)
+                # end_time = time.time()  #Calculatio for FPS
+                # print(f"The time spent in this loop is: {end_time - start_time}")
 
 
-            else: 
-              break
+            # else: 
+            #   break
 
         cap.release()
         # client_socket.close()

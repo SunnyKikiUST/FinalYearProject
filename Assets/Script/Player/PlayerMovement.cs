@@ -18,7 +18,6 @@ public class PlayerMovement : MonoBehaviour
 
     private Animator animator;
     private string current_animation;
-    private string previous_animation = "Fast Run";
     private AnimatorStateInfo stateInfo;
     private Vector3 last_position;
     private Vector3 forward_size = Vector3.forward;
@@ -133,7 +132,7 @@ public class PlayerMovement : MonoBehaviour
         ChangeAnimation("Running Slide");
     }
 
-    private void ChangeAnimation(string animation, float cross_fade = 0.2f)
+    private void ChangeAnimation(string animation, float cross_fade = 0f)
     {
         if (current_animation != animation)
         {
@@ -151,7 +150,6 @@ public class PlayerMovement : MonoBehaviour
 
             Debug.Log($"test Changing animation from {current_animation} to {animation}");
 
-            previous_animation = current_animation;
             current_animation = animation;
 
 
@@ -247,16 +245,5 @@ public class PlayerMovement : MonoBehaviour
     public void SetBackToDefaultSpeed() //new
     {
         player_speed = default_player_speed;
-    }
-    
-    public void PauseMovementState() //new
-    {
-        // Stop moving forward
-        forward_size = Vector3.zero;
-    }
-
-    public void ResumeMovementState() //new
-    {
-        forward_size = Vector3.forward;
     }
 }

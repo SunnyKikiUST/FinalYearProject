@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -64,4 +65,15 @@ public class PlayerPreference : MonoBehaviour
     {
         PlayerPrefs.SetFloat("Coin_Collect_Sound", coin_sound_slider.value);
     }
+
+    public void UpdateOpenAIApi(TMP_InputField api_field)
+    {
+        PlayerPrefs.SetString("OpenAI_api_key", api_field.text);
+    }
+
+    public void UpdateWebcamIndex(TMP_InputField webcam_index_field)
+    {
+        PlayerPrefs.SetString("Webcam_index", webcam_index_field.text);
+    }
+
 }

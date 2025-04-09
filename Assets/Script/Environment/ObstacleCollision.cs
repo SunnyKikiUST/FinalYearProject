@@ -33,9 +33,12 @@ public class ObstacleCollision : MonoBehaviour
             obstacleHasCollided = true;
 
             // Stop character moving
-            // other.gameObject.GetComponent<PlayerMovementWithMVEstimation>().enabled = false;
-            other.gameObject.GetComponent<PlayerMovement>().StopOnCollision();
-            other.gameObject.GetComponent<PlayerMovement>().enabled = false;
+            PlayerMovementWithMVEstimationTest playermovement = other.gameObject.GetComponent<PlayerMovementWithMVEstimationTest>();
+            playermovement.StopOnCollision();
+            playermovement.StopThread();
+            playermovement.enabled = false;
+            //other.gameObject.GetComponent<PlayerMovement>().StopOnCollision();
+            //other.gameObject.GetComponent<PlayerMovement>().enabled = false;
 
 
             Debug.Log($"collision happened: {other}");
@@ -77,6 +80,7 @@ public class ObstacleCollision : MonoBehaviour
             controller.PlayHurtFX();
             gameObject.SetActive(false);
             FatigueMonitoringSystem.Instance.FailObstacle();
+            FatigueMonitoringSystem.Instance.UseShowExhastionScoreChangeWithCoroutine(true);
         }
     }
 

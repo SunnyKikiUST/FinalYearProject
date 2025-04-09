@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
-using static MongoDB.Driver.WriteConcern;
+using UnityEngine.UI;
+using System.Collections;
 
 public class FatigueMonitoringSystem : MonoBehaviour
 {
@@ -19,6 +20,9 @@ public class FatigueMonitoringSystem : MonoBehaviour
 
     [Header("UI Element")]
     [SerializeField] private TextMeshProUGUI exhaustion_score_text;
+    [SerializeField] private GameObject exhaustion_increment_text;
+    [SerializeField] private GameObject exhaustion_decrement_text;
+    [SerializeField] private Slider exhaustion_score_slider;
 
     private float difficulty_increase_timer = 0f;
     private bool shouldIncreaseDifficulty = false;
@@ -86,6 +90,7 @@ public class FatigueMonitoringSystem : MonoBehaviour
         Debug.Log($"fatigue increased speed consecutive_obstacles_passed:{consecutive_obstacles_passed}");
         if (consecutive_obstacles_passed >= 5)
         {
+            StartCoroutine(ShowExhaustionScoreChange(false));
             exhaustion_score -= exhaustion_decrease_rate;
             consecutive_obstacles_passed %= 5; // To prevent the UpdateDifficulty does not reflect instantly 
         }
@@ -157,7 +162,9 @@ public class FatigueMonitoringSystem : MonoBehaviour
             if (HasChangedExhaustionLevel())
             {
                 Debug.Log("wasAboveFreshState 5"); //have bug
-                player.GetComponent<PlayerMovement>().SetBackToDefaultSpeed();
+
+                player.GetComponent<PlayerMovementWithMVEstimationTest>().SetBackToDefaultSpeed();
+                //player.GetComponent<PlayerMovement>().SetBackToDefaultSpeed();
                 obstacle_spawner.SetBackToDefaultInterval();
                 percentage_gain_for_speed = 0;
                 obstacle_spawner.SetBackToDefaultInterval();
@@ -168,7 +175,8 @@ public class FatigueMonitoringSystem : MonoBehaviour
             {
                 Debug.Log("fatigue player_speed increasing difficulty");
                 percentage_gain_for_speed += 5;
-                percentage_gain_for_speed = player.GetComponent<PlayerMovement>().IncreaseSpeedFromDefault(percentage_gain_for_speed);
+                percentage_gain_for_speed = player.GetComponent<PlayerMovementWithMVEstimationTest>().IncreaseSpeedFromDefault(percentage_gain_for_speed);
+                //percentage_gain_for_speed = player.GetComponent<PlayerMovement>().IncreaseSpeedFromDefault(percentage_gain_for_speed);
                 shouldIncreaseDifficulty = false;
             }
         }
@@ -177,7 +185,8 @@ public class FatigueMonitoringSystem : MonoBehaviour
             if (HasChangedExhaustionLevel())
             {
                 // Slightly Tired
-                player.GetComponent<PlayerMovement>().DecreaseSpeedFromDefault(5); // 5% of default speed decrease from default speed
+                player.GetComponent<PlayerMovementWithMVEstimationTest>().DecreaseSpeedFromDefault(5); // 5% of default speed decrease from default speed
+                //player.GetComponent<PlayerMovement>().DecreaseSpeedFromDefault(5); // 5% of default speed decrease from default speed
                 obstacle_spawner.IncreaseSpawnIntervalFromDefault(0.1f);
             }
 
@@ -194,7 +203,8 @@ public class FatigueMonitoringSystem : MonoBehaviour
             if (HasChangedExhaustionLevel())
             {
                 // Fatigue
-                player.GetComponent<PlayerMovement>().DecreaseSpeedFromDefault(10); // 10% of default speed decrease from default speed
+                player.GetComponent<PlayerMovementWithMVEstimationTest>().DecreaseSpeedFromDefault(10);
+                //player.GetComponent<PlayerMovement>().DecreaseSpeedFromDefault(10); // 10% of default speed decrease from default speed
                 obstacle_spawner.IncreaseSpawnIntervalFromDefault(0.2f);
             }
         }
@@ -203,7 +213,8 @@ public class FatigueMonitoringSystem : MonoBehaviour
             if (HasChangedExhaustionLevel())
             {
                 // Very Tired
-                player.GetComponent<PlayerMovement>().DecreaseSpeedFromDefault(15); // 15% of default speed decrease from default speed
+                player.GetComponent<PlayerMovementWithMVEstimationTest>().DecreaseSpeedFromDefault(15);
+                //player.GetComponent<PlayerMovement>().DecreaseSpeedFromDefault(15); // 15% of default speed decrease from default speed
                 obstacle_spawner.IncreaseSpawnIntervalFromDefault(0.4f);
             }
         }
@@ -212,7 +223,8 @@ public class FatigueMonitoringSystem : MonoBehaviour
             if (HasChangedExhaustionLevel())
             {
                 // Exhausted
-                player.GetComponent<PlayerMovement>().DecreaseSpeedFromDefault(20); // 20% of default speed decrease from default speed
+                player.GetComponent<PlayerMovementWithMVEstimationTest>().DecreaseSpeedFromDefault(20);
+                //player.GetComponent<PlayerMovement>().DecreaseSpeedFromDefault(20); // 20% of default speed decrease from default speed
                 obstacle_spawner.IncreaseSpawnIntervalFromDefault(0.5f);
             }
         }
@@ -229,6 +241,7 @@ public class FatigueMonitoringSystem : MonoBehaviour
     private void UpdateGameUI()
     {
         exhaustion_score_text.text = $"{exhaustion_score}";
+        SetExhaustionScore(exhaustion_score);
     }
 
     // Hitting obstacle and fail to do exercise will be gameover after call this
@@ -242,5 +255,37 @@ public class FatigueMonitoringSystem : MonoBehaviour
     {
         ObstacleCollision.CannotGameOver();
         // Exercise part ...
+    }
+
+    public void UseShowExhastionScoreChangeWithCoroutine(bool isIncremental)
+    {
+        StartCoroutine(ShowExhaustionScoreChange(isIncremental));
+    }
+
+    // Set the slider based on exhaustion score
+    private void SetExhaustionScore(float exhaustion_score)
+    {
+        exhaustion_score_slider.value = exhaustion_score;
+    }
+
+    IEnumerator ShowExhaustionScoreChange(bool isIncremental)
+    {
+
+        if (isIncremental)
+        {
+            exhaustion_increment_text.GetComponent<TextMeshProUGUI>().text = $"+ {exhaustion_increase_rate} fatigue !";
+            exhaustion_increment_text.SetActive(false);
+            exhaustion_increment_text.SetActive(true);
+            //yield return new WaitForSecondsRealtime(2);
+            yield break;
+        }
+        else
+        {
+            exhaustion_decrement_text.GetComponent<TextMeshProUGUI>().text = $"- {exhaustion_decrease_rate} fatigue !";
+            exhaustion_decrement_text.SetActive(false);
+            exhaustion_decrement_text.SetActive(true);
+            //yield return new WaitForSecondsRealtime(2);
+            yield break;
+        }
     }
 }
